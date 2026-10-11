@@ -32,6 +32,7 @@ describe("openSessionStore", () => {
   const dirs: string[] = [];
   afterEach(() => {
     for (const dir of dirs) rmSync(dir, { recursive: true, force: true });
+    dirs.length = 0;
   });
 
   function store() {
@@ -95,5 +96,36 @@ describe("openSessionStore", () => {
       intake: completeDemoLike(RunMode.Full),
     });
     expect(() => db.startSession(row.id)).toThrow(/not_approved/);
+  });
+
+  it("start writes epistemic snapshot; draft epistemic is null; freeze still blocks patch", () => {
+    const db = store();
+    const created = db.createSession({
+      mode: RunMode.Demo,
+      intake: completeDemoLike(RunMode.Demo),
+    });
+    expect(created.epistemic).toBeNull();
+    db.approveSession(created.id);
+    const started = db.startSession(created.id);
+    expect(started.status).toBe("frozen");
+    expect(started.epistemic).not.toBeNull();
+    expect(started.epistemic?.evidence.length).toBe(1);
+    expect(started.epistemic?.evidence[0]?.vendor).toBe("demo_fixture");
+
+    const reopened = openSessionStore(join(dirs[0], "sandbox.sqlite"));
+    expect(reopened.getSession(created.id)?.epistemic?.evidence[0]?.vendor).toBe(
+      "demo_fixture",
+    );
+  });
+
+  it("Full start has empty evidence", () => {
+    const db = store();
+    const created = db.createSession({
+      mode: RunMode.Full,
+      intake: completeDemoLike(RunMode.Full),
+    });
+    db.approveSession(created.id);
+    const started = db.startSession(created.id);
+    expect(started.epistemic?.evidence).toEqual([]);
   });
 });

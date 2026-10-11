@@ -1,13 +1,19 @@
 import { randomUUID } from "node:crypto";
 import Database from "better-sqlite3";
 import {
+  epistemicSnapshotSchema,
   intakeDraftPartialSchema,
   isIntakeComplete,
+  projectIntakeToEpistemic,
+  validateEpistemicSnapshot,
+  type EpistemicSnapshot,
   type IntakeDraftPartial,
 } from "@ceo-sandbox/domain";
 import { RunMode } from "@ceo-sandbox/domain";
+import { EpistemicProjectionError } from "./epistemic-projection-error";
 import { FrozenSessionError } from "./frozen-error";
 
+export { EpistemicProjectionError } from "./epistemic-projection-error";
 export { FrozenSessionError } from "./frozen-error";
 
 const CREATE_TABLE = `
@@ -21,7 +27,8 @@ CREATE TABLE IF NOT EXISTS sessions (
   created_at TEXT NOT NULL,
   updated_at TEXT NOT NULL,
   approved_at TEXT,
-  frozen_at TEXT
+  frozen_at TEXT,
+  epistemic_json TEXT
 );
 `;
 
@@ -38,6 +45,7 @@ export type SessionRecord = {
   updatedAt: string;
   approvedAt: string | null;
   frozenAt: string | null;
+  epistemic: EpistemicSnapshot | null;
 };
 
 type SessionRow = {
@@ -51,6 +59,7 @@ type SessionRow = {
   updated_at: string;
   approved_at: string | null;
   frozen_at: string | null;
+  epistemic_json: string | null;
 };
 
 export type SessionStore = {
@@ -65,11 +74,16 @@ export type SessionStore = {
 };
 
 const SELECT_COLUMNS = `id, contract_version, mode, status, question_revision, intake_json,
-  created_at, updated_at, approved_at, frozen_at`;
+  created_at, updated_at, approved_at, frozen_at, epistemic_json`;
 
 function withDb<T>(filePath: string, fn: (db: Database.Database) => T): T {
   const db = new Database(filePath);
   db.exec(CREATE_TABLE);
+  try {
+    db.exec(`ALTER TABLE sessions ADD COLUMN epistemic_json TEXT`);
+  } catch {
+    // column already exists
+  }
   try {
     return fn(db);
   } finally {
@@ -89,6 +103,9 @@ function rowToRecord(row: SessionRow): SessionRecord {
     updatedAt: row.updated_at,
     approvedAt: row.approved_at,
     frozenAt: row.frozen_at,
+    epistemic: row.epistemic_json
+      ? epistemicSnapshotSchema.parse(JSON.parse(row.epistemic_json))
+      : null,
   };
 }
 
@@ -177,12 +194,24 @@ export function openSessionStore(filePath: string): SessionStore {
         if (row.status !== "approved") {
           throw new Error("not_approved");
         }
+        const intake = intakeDraftPartialSchema.parse(
+          JSON.parse(row.intake_json),
+        );
         const now = new Date().toISOString();
+        const snapshot = projectIntakeToEpistemic(intake, {
+          mode: row.mode as RunMode,
+          sessionId: id,
+          now,
+        });
+        const validation = validateEpistemicSnapshot(snapshot);
+        if (!validation.ok) {
+          throw new EpistemicProjectionError();
+        }
         db.prepare(
           `UPDATE sessions
-         SET status = 'frozen', frozen_at = ?, updated_at = ?
+         SET status = 'frozen', frozen_at = ?, updated_at = ?, epistemic_json = ?
          WHERE id = ?`,
-        ).run(now, now, id);
+        ).run(now, now, JSON.stringify(snapshot), id);
         return rowToRecord(requireRow(db, id));
       });
     },
