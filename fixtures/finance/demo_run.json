@@ -1,0 +1,35 @@
+{
+  "_fixtureLabel": "Recorded finance fixture — not live cfo.ai",
+  "financeRunId": "fixture-finance-demo-v1",
+  "recordedAt": "2026-10-11",
+  "scenariosCompared": ["pilot", "broad_launch"],
+  "baseline": {
+    "cashUsd": 2000000,
+    "mrrUsd": 80000,
+    "runwayMonthsUserInput": 12,
+    "source": "demo_fixture"
+  },
+  "mapped": {
+    "pilot": {
+      "revenue": null,
+      "burn": null,
+      "runway": null,
+      "margin": null,
+      "adoption": 8,
+      "note": "Replace with recorded MCP compare after workspace model exists"
+    },
+    "broad_launch": {
+      "revenue": null,
+      "burn": null,
+      "runway": null,
+      "margin": null,
+      "adoption": 18,
+      "note": "Replace with recorded MCP compare after workspace model exists"
+    }
+  },
+  "sensitivity": {
+    "onScenario": "pilot",
+    "price": { "low": 20, "base": 25, "high": 30 },
+    "adoption": { "low": 5.6, "base": 8, "high": 10.4 }
+  }
+}

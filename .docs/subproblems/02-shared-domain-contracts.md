@@ -231,7 +231,8 @@ Illustrative minimums for alignment before JSON Schema exists. Optional fields o
 | **Feature proposal** | `sessionId`, description, change type (feature \| pricing \| ui \| other) |
 | **Evidence** | `id`, `sessionId`, `source`, `summary`, external identity (Q07), `retrievedAt` |
 | **Claim** (H/A/U) | `id`, `sessionId`, `kind`, `statement`; Assumption adds `value` + unit when numeric |
-| **Run** | `id`, `sessionId`, `status`, `startedAt`; `neatlogsTraceId` unless `fallback` run |
+| **Run** | `id`, `sessionId`, `status`, `startedAt`; `neatlogsTraceId` unless `fallback` run; optional `codeImpactRunId`; `missingData.codeImpact` when skipped |
+| **CodeImpactArtifact** | `id` (`codeImpactRunId`), `runId`, `repoRef`, `commitSha`, `candidatePaths[]`, summarized tool outputs, `epistemicLabel` (Inferred), optional `skippedReason` |
 | **Archetype** | `id`, `sessionId`, structured profile fields, `primarySegment`, optional `tags[]` |
 | **RespondentEvaluation** | `id`, `panelRunId`, `archetypeId`, `primaryChoice` (Q41 enum), `snapshot` |
 | **Segment aggregate** | `panelRunId`, `primarySegment`, counts/rates, `simulatedLabel`, disagreement summary |

@@ -1,0 +1,96 @@
+{
+  "contractVersion": 1,
+  "orgId": "103299",
+  "mcpUrl": "https://api.cfo.ai/mcp",
+  "setupStatus": "deferred_per_tenant",
+  "setupNote": "Do not build generic tables in the shared workspace. Mapping is filled per Decision when the operator connects their cfo.ai model (or a tenant template). Scenario names may be reused; table/page targets come from tenant config or onboarding, not a one-size hackathon model.",
+  "scenarios": {
+    "pilot": {
+      "strategyKind": "pilot",
+      "cfoScenarioName": "CEO sandbox - Pilot",
+      "cfoScenarioRef": "CEO sandbox - Pilot#7a9"
+    },
+    "broad_launch": {
+      "strategyKind": "broad_launch",
+      "cfoScenarioName": "CEO sandbox - Broad",
+      "cfoScenarioRef": "CEO sandbox - Broad#cf9"
+    }
+  },
+  "compare": {
+    "inspectTableBlocks": {
+      "page": "CEO Sandbox",
+      "table": "Feature decision outputs",
+      "scenarios": ["CEO sandbox - Pilot", "CEO sandbox - Broad"]
+    }
+  },
+  "inputs": {
+    "buildCostOneTimeUsd": {
+      "page": "CEO Sandbox",
+      "table": "Feature decision inputs",
+      "row": "One-time build cost",
+      "mapsToAssumption": "build_cost"
+    },
+    "buildDurationMonths": {
+      "page": "CEO Sandbox",
+      "table": "Feature decision inputs",
+      "row": "Build duration (months)",
+      "mapsToAssumption": "build_timeline_months"
+    },
+    "pricePerSeatUsd": {
+      "page": "CEO Sandbox",
+      "table": "Feature decision inputs",
+      "row": "Price per seat / month",
+      "mapsToAssumption": "price_per_seat"
+    },
+    "adoptionRatePercent": {
+      "page": "CEO Sandbox",
+      "table": "Feature decision inputs",
+      "row": "Adoption rate (%)",
+      "mapsToAssumption": "adoption_rate",
+      "perScenario": true
+    },
+    "monthlyInferencePerUserUsd": {
+      "page": "CEO Sandbox",
+      "table": "Feature decision inputs",
+      "row": "Variable COGS per active user / month",
+      "mapsToAssumption": "inference_cost_per_user"
+    },
+    "pilotCohortSize": {
+      "page": "CEO Sandbox",
+      "table": "Feature decision inputs",
+      "row": "Pilot cohort size (accounts)",
+      "mapsToAssumption": "pilot_cohort_size",
+      "scenarioOnly": "pilot"
+    }
+  },
+  "outputs": {
+    "monthlyRevenue": {
+      "page": "CEO Sandbox",
+      "table": "Feature decision outputs",
+      "row": "Incremental MRR",
+      "canonical": "revenue"
+    },
+    "monthlyBurn": {
+      "page": "CEO Sandbox",
+      "table": "Feature decision outputs",
+      "row": "Incremental monthly burn",
+      "canonical": "burn"
+    },
+    "runwayMonths": {
+      "page": "CEO Sandbox",
+      "table": "Feature decision outputs",
+      "row": "Runway (months)",
+      "canonical": "runway"
+    },
+    "grossMarginPercent": {
+      "page": "CEO Sandbox",
+      "table": "Feature decision outputs",
+      "row": "Gross margin (%)",
+      "canonical": "margin"
+    }
+  },
+  "sensitivity": {
+    "applyToScenario": "CEO sandbox - Pilot",
+    "inputs": ["pricePerSeatUsd", "adoptionRatePercent"]
+  }
+}

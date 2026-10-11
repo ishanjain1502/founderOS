@@ -1,0 +1,76 @@
+{
+  "id": "demo-ai-analytics-premium",
+  "label": "AI analytics premium add-on (illustrative)",
+  "illustrative": true,
+  "decisionQuestion": "Should we build and launch AI-powered analytics as a premium add-on?",
+  "company": {
+    "name": "Example SaaS Co",
+    "productSummary": "B2B workflow SaaS for mid-market teams; core product is project and ops tracking.",
+    "customerCount": 1000,
+    "cashUsd": 2000000,
+    "mrrUsd": 80000,
+    "runwayMonths": 12
+  },
+  "feature": {
+    "title": "AI-powered analytics premium add-on",
+    "description": "Natural-language insights and anomaly detection on customer workspace data; sold as optional premium tier or per-seat add-on.",
+    "packaging": "Premium add-on, per-seat monthly"
+  },
+  "goals": ["Increase ARPU", "Win enterprise expansion deals"],
+  "constraints": {
+    "budgetUsd": 250000,
+    "executionMonths": 4,
+    "notes": "Avoid broad SMB price pressure; prefer learning before full GA."
+  },
+  "targetMarketBehavior": "Mixed SMB and enterprise; enterprise cares about insights; SMB is price-sensitive.",
+  "panelSeed": 42,
+  "crustdataSearchHint": "B2B SaaS workflow software companies offering analytics or business intelligence for SMB and mid-market.",
+  "scenarios": {
+    "pilot": {
+      "strategyKind": "pilot",
+      "label": "Enterprise validation pilot",
+      "scope": "Offer beta analytics to up to 10 enterprise accounts (500+ employees); not available to SMB.",
+      "targetSegment": "enterprise_buyer",
+      "pilotDurationWeeks": 8,
+      "successCriterion": "At least 3 of 10 accounts convert to paid add-on or expand contract within 8 weeks.",
+      "failCriterion": "Fewer than 2 accounts activate weekly active usage by week 4.",
+      "assumptions": {
+        "build_cost_usd": 180000,
+        "build_timeline_months": 3,
+        "price_per_seat_usd": 25,
+        "adoption_rate_percent": 8,
+        "pilot_cohort_size": 10,
+        "inference_cost_per_user_usd": 4
+      }
+    },
+    "broad_launch": {
+      "strategyKind": "broad_launch",
+      "label": "Broad launch (all customers)",
+      "scope": "GA to entire customer base (SMB + enterprise) after build complete.",
+      "assumptions": {
+        "build_cost_usd": 220000,
+        "build_timeline_months": 4,
+        "price_per_seat_usd": 25,
+        "adoption_rate_percent": 18,
+        "inference_cost_per_user_usd": 4
+      }
+    }
+  },
+  "qualitativeScenarios": {
+    "delay": {
+      "strategyKind": "delay",
+      "label": "Delay 6 months",
+      "scope": "Defer build; revisit after core retention work."
+    },
+    "do_not_build": {
+      "strategyKind": "do_not_build",
+      "label": "Do not build",
+      "scope": "Do not invest in this feature; focus on core product."
+    },
+    "enterprise_segment_launch": {
+      "strategyKind": "enterprise_segment_launch",
+      "label": "Enterprise-only GA",
+      "scope": "Ship only to enterprise segment, not a time-boxed pilot."
+    }
+  }
+}

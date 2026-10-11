@@ -11,8 +11,8 @@ This folder decomposes that spec into subproblems that **must** be solved before
    - the problem, in depth
    - what “implemented to the end” would have to cover
    - **locked decisions** copied from the spec only
-   - **open questions** that still need your answers
-3. Answer questions by **ID** (example: `SP-06-Q12`). Until you answer, that item is not a decision.
+   - **locked answers** on each question line (design pass complete for SP-01–SP-14 as of repo state)
+3. Answer questions by **ID** (example: `SP-06-Q12`). **Bold text after a question ID** is the decision; change only deliberately and keep IDs stable.
 
 No code belongs in this phase.
 
@@ -43,13 +43,13 @@ Those appear only as questions.
 | SP-07 | `07-cfo-ai-financial-evaluation.md` | Financial scenarios | 47 | Required product. Outputs are only as good as explicit inputs. |
 | SP-08 | `08-scenario-comparison-and-recommendation.md` | Compare options, recommend, name next experiment | 35 | Workflow steps 7 and 9. The CEO output. |
 | SP-09 | `09-application-state-and-revision-loop.md` | Application-owned state and re-evaluation | 34 | Spec forbids treating Entire as the business-state brancher. Workflow steps 8 and 10. |
-| SP-10 | `10-agent-orchestration.md` | Autonomous CEO agent loop | 41 | Orchestrates tools. Deterministic vs LLM split is specified in principle, not in detail. |
+| SP-10 | `10-agent-orchestration.md` | Autonomous CEO agent loop | 42 | Orchestrates tools; `code_impact` gated by `SKIP_CODE_IMPACT`. |
 | SP-11 | `11-neatlogs-observability.md` | Inspectable agent run | 36 | Required product. Observability, not the decision engine. |
-| SP-12 | `12-entire-checkpoints-and-history.md` | Supported development history | 28 | Required product. Only verified Entire features. |
+| SP-12 | `12-entire-checkpoints-and-history.md` | Entire dev history + server code impact alt. | 33 | Required Entire (CLI/hooks). Track B = git+OSS alternate to entire.io. |
 | SP-13 | `13-human-interface-demo-and-reporting.md` | What a human sees in 3–5 minutes | 41 | Demo flow and labels. UI is unspecified. |
 | SP-14 | `14-cost-latency-fallbacks-and-integration-risk.md` | Cost, speed, smoke tests, fallbacks, claim safety | 44 | Spec risk table. Cross-cuts every integration. |
 
-Question IDs are stable (`SP-06-Q12`). Total in this pass: **564**. Some questions overlap on purpose where two subproblems would otherwise assume each other’s answers.
+Question IDs are stable (`SP-06-Q12`). Total in this pass: **570**. Some questions overlap on purpose where two subproblems would otherwise assume each other’s answers.
 
 ## Dependency map
 
@@ -70,7 +70,7 @@ SP-01 Scope
                                 -> SP-12 Entire
                                 -> SP-13 Human interface / demo
   SP-14 Cost / latency / fallbacks / claim safety
-    constrains SP-05, SP-06, SP-07, SP-10, SP-11, SP-13
+    constrains SP-05, SP-06, SP-07, SP-10, SP-11, SP-12, SP-13
 ```
 
 SP-04 is not a product; it is a rule layer that SP-05, SP-06, SP-07, SP-08, SP-09, and SP-13 must obey.
