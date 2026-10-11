@@ -17,6 +17,9 @@ const chipStyle = {
   background: "#eee",
 } as const;
 
+const INFERRED_NOT_EVIDENCE_COPY =
+  "These inference statements are not Evidence.";
+
 const sectionStyle = { marginTop: "1.25rem" } as const;
 const rowStyle = {
   marginTop: "0.75rem",
@@ -96,6 +99,9 @@ export function EpistemicLists({ model }: { model: EpistemicViewModel }) {
           model.unknowns.map((row, i) => (
             <div key={i} style={rowStyle}>
               <p style={{ margin: 0 }}>{row.statement}</p>
+              <p style={{ margin: "0.35rem 0 0", fontSize: "0.85rem" }}>
+                <strong>Unknown</strong>
+              </p>
             </div>
           ))
         )}
@@ -116,6 +122,9 @@ export function EpistemicLists({ model }: { model: EpistemicViewModel }) {
 
       <section style={sectionStyle}>
         <h2 style={{ fontSize: "1.1rem", marginBottom: "0.35rem" }}>Inferred</h2>
+        <p style={{ margin: "0 0 0.5rem", fontSize: "0.85rem", color: "#555" }}>
+          {INFERRED_NOT_EVIDENCE_COPY}
+        </p>
         {model.inferences.length === 0 ? (
           <p style={{ color: "#666", fontSize: "0.9rem" }}>None listed.</p>
         ) : (
