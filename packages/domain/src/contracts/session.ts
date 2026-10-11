@@ -1,6 +1,7 @@
 import { z } from "zod";
-import { baseEntitySchema, CONTRACT_VERSION } from "./base";
-import { featureChangeTypeSchema } from "./enums";
+import { baseEntitySchema } from "./base";
+import { assumptionNumericSchema, claimRationaleTagSchema } from "./claim";
+import { featureChangeTypeSchema, strategyKindSchema } from "./enums";
 import { RunMode } from "../run-mode";
 
 export const runModeSchema = z.nativeEnum(RunMode);
@@ -57,7 +58,36 @@ const sessionDraftDecisionSchema = z.object({
 const sessionDraftCompanyProfileSchema = z.object({
   name: z.string().min(1).optional(),
   productSummary: z.string().min(1),
+  customerCount: z.number().int().nonnegative().optional(),
+  cashUsd: z.number().nonnegative().optional(),
+  mrrUsd: z.number().nonnegative().optional(),
+  runwayMonths: z.number().nonnegative().optional(),
 });
+
+/** In-memory assumption row before first persist (demo hydrate / intake). */
+export const sessionDraftAssumptionSchema = z.object({
+  id: z.string().uuid(),
+  statement: z.string().min(1),
+  numeric: assumptionNumericSchema,
+  rationaleTag: claimRationaleTagSchema,
+  /** cfo-ai-mapping `mapsToAssumption` key (e.g. adoption_rate, build_cost). */
+  mapsTo: z.string().min(1),
+  scenarioKey: z.string().min(1).optional(),
+});
+
+export type SessionDraftAssumption = z.infer<typeof sessionDraftAssumptionSchema>;
+
+/** Scenario stub with assumption refs for draft hydration. */
+export const sessionDraftScenarioSchema = z.object({
+  key: z.string().min(1),
+  strategyKind: strategyKindSchema,
+  label: z.string().min(1),
+  scope: z.string().min(1),
+  assumptionRefs: z.array(z.string().uuid()),
+  requiresFinance: z.boolean().default(true),
+});
+
+export type SessionDraftScenario = z.infer<typeof sessionDraftScenarioSchema>;
 
 const sessionDraftFeatureProposalSchema = z.object({
   title: z.string().min(1).optional(),
@@ -71,6 +101,8 @@ export const sessionDraftSchema = z.object({
   decision: sessionDraftDecisionSchema,
   companyProfile: sessionDraftCompanyProfileSchema,
   featureProposal: sessionDraftFeatureProposalSchema,
+  scenarios: z.array(sessionDraftScenarioSchema).default([]),
+  assumptions: z.array(sessionDraftAssumptionSchema).default([]),
 });
 
 export type SessionDraft = z.infer<typeof sessionDraftSchema>;

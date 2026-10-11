@@ -22,3 +22,12 @@ export {
   type DemoScenarioAssumptions,
   loadDemoCard,
 } from "./demo-card";
+
+export { demoCardToSessionDraft } from "./demo-card-to-draft";
+
+export {
+  type SessionDraft,
+  type SessionDraftAssumption,
+  type SessionDraftScenario,
+  sessionDraftSchema,
+} from "./contracts/session";
