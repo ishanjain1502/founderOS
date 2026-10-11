@@ -1,0 +1,9 @@
+{
+  "name": "idea-simulation",
+  "private": true,
+  "scripts": {
+    "test": "pnpm -r test",
+    "lint": "pnpm -r lint"
+  },
+  "packageManager": "pnpm@9.15.0"
+}
