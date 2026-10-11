@@ -3,12 +3,38 @@ import { claimSchema } from "./claim";
 import { evidenceSchema, type Evidence } from "./evidence";
 import { inferenceSchema } from "./recommendation";
 
+export const crustdataSourceModeSchema = z.enum([
+  "live",
+  "recorded",
+  "fallback",
+  "none",
+]);
+
+export type CrustdataSourceMode = z.infer<typeof crustdataSourceModeSchema>;
+
+export const crustdataResearchStateSchema = z.object({
+  status: z.enum(["idle", "ran", "fallback", "failed"]),
+  query: z.string(),
+  ranAt: z.string().datetime().optional(),
+  httpCallCount: z.number().int().nonnegative(),
+  usedFallback: z.boolean(),
+  sourceMode: crustdataSourceModeSchema,
+  error: z.string().max(200).optional(),
+});
+
+export type CrustdataResearchState = z.infer<typeof crustdataResearchStateSchema>;
+
 export const epistemicSnapshotSchema = z
   .object({
     contractVersion: z.literal(1),
     evidence: z.array(evidenceSchema),
     claims: z.array(claimSchema),
     inferences: z.array(inferenceSchema),
+    marketResearch: z
+      .object({
+        crustdata: crustdataResearchStateSchema,
+      })
+      .optional(),
   })
   .strict();
 

@@ -7,6 +7,8 @@ export {
 
 export { RunMode, parseRunMode } from "./run-mode";
 
+export { buildCrustdataQuery, type BuildCrustdataQueryInput } from "./crustdata-query";
+
 export {
   FORBIDDEN_PHRASES,
   findForbiddenPhrases,
@@ -65,10 +67,14 @@ export {
 
 export {
   epistemicSnapshotSchema,
+  crustdataResearchStateSchema,
+  crustdataSourceModeSchema,
   emptyEpistemicSnapshot,
   validateEpistemicSnapshot,
   epistemicWarnings,
   type EpistemicSnapshot,
+  type CrustdataResearchState,
+  type CrustdataSourceMode,
 } from "./contracts/epistemic-snapshot";
 
 export {
