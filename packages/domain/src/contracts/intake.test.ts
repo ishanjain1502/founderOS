@@ -106,6 +106,31 @@ describe("deepMergeIntake", () => {
     expect(merged.company?.competitors).toEqual(["CompA"]);
     expect(merged.fieldSources?.["company.name"]).toBe(FieldSource.User);
   });
+
+  it("does not mark scopeCheck paths as user fieldSources", () => {
+    const base = emptyIntakeDraft(RunMode.Full);
+    const merged = deepMergeIntake(base, {
+      scopeCheck: { status: "in_scope", reason: "ok" },
+      company: { name: "Acme" },
+    });
+    expect(merged.scopeCheck?.status).toBe("in_scope");
+    expect(merged.fieldSources?.["scopeCheck"]).toBeUndefined();
+    expect(merged.fieldSources?.["scopeCheck.status"]).toBeUndefined();
+    expect(merged.fieldSources?.["scopeCheck.reason"]).toBeUndefined();
+    expect(merged.fieldSources?.["company.name"]).toBe(FieldSource.User);
+  });
+
+  it("ignores null or undefined scopeCheck patch without throwing", () => {
+    const base = emptyIntakeDraft(RunMode.Full);
+    expect(base.scopeCheck?.status).toBe("unknown");
+
+    const fromNull = deepMergeIntake(base, { scopeCheck: null });
+    expect(fromNull.scopeCheck?.status).toBe("unknown");
+    expect(fromNull.fieldSources?.["scopeCheck"]).toBeUndefined();
+
+    const fromUndefined = deepMergeIntake(base, { scopeCheck: undefined });
+    expect(fromUndefined.scopeCheck?.status).toBe("unknown");
+  });
 });
 
 describe("intakeDraftSchema unknown keys", () => {

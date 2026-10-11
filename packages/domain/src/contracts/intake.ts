@@ -587,6 +587,13 @@ const FIELD_SOURCE_EXCLUDED = new Set([
   "company.deliveryModel",
 ]);
 
+function isFieldSourceExcluded(path: string): boolean {
+  if (FIELD_SOURCE_EXCLUDED.has(path)) {
+    return true;
+  }
+  return path.startsWith("scopeCheck.");
+}
+
 function collectPatchPaths(
   value: unknown,
   prefix: string,
@@ -674,7 +681,11 @@ export function deepMergeIntake(
     assumptions: base.assumptions ? [...base.assumptions] : undefined,
   };
 
-  if ("scopeCheck" in patch) {
+  if (
+    patch.scopeCheck !== null &&
+    typeof patch.scopeCheck === "object" &&
+    !Array.isArray(patch.scopeCheck)
+  ) {
     result.scopeCheck = mergePlainObjects(
       result.scopeCheck as Record<string, unknown> | undefined,
       patch.scopeCheck as Record<string, unknown>,
@@ -762,7 +773,7 @@ export function deepMergeIntake(
   collectPatchPaths(patch, "", patchPaths);
 
   for (const path of patchPaths) {
-    if (FIELD_SOURCE_EXCLUDED.has(path)) {
+    if (isFieldSourceExcluded(path)) {
       continue;
     }
     if (ARRAY_REPLACE_PATHS.has(path)) {
