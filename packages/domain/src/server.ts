@@ -1,5 +1,7 @@
 /** Node / API route exports (may use Node built-ins). */
 export { demoCardToSessionDraft } from "./demo-card-to-draft";
+export { demoCardToIntakeDraft } from "./demo-card-to-intake";
+export { intakeDraftToSessionDraft } from "./intake-to-session-draft";
 
 export {
   type SessionDraft,
