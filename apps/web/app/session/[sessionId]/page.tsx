@@ -3,19 +3,29 @@
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
-import { RunMode, type IntakeDraftPartial } from "@ceo-sandbox/domain";
+import {
+  RunMode,
+  buildEpistemicViewModel,
+  type EpistemicSnapshot,
+  type IntakeDraftPartial,
+} from "@ceo-sandbox/domain";
 import { mainStyle } from "@/components/intake/steps/shared";
+import { EpistemicLists } from "@/components/session/EpistemicLists";
 
 type SessionPayload = {
   id: string;
   status: string;
   intake: IntakeDraftPartial;
+  epistemic: EpistemicSnapshot | null;
 };
 
 export default function SessionPlaceholderPage() {
   const params = useParams<{ sessionId: string }>();
   const sessionId = params.sessionId;
   const [intake, setIntake] = useState<IntakeDraftPartial | null>(null);
+  const [epistemicVm, setEpistemicVm] = useState(
+    buildEpistemicViewModel(null),
+  );
   const [loading, setLoading] = useState(true);
   const [missing, setMissing] = useState(false);
 
@@ -38,6 +48,7 @@ export default function SessionPlaceholderPage() {
       }
       const body = (await res.json()) as SessionPayload;
       setIntake(body.intake);
+      setEpistemicVm(buildEpistemicViewModel(body.epistemic ?? null));
       setLoading(false);
     })();
     return () => {
@@ -91,6 +102,7 @@ export default function SessionPlaceholderPage() {
           </span>
         </p>
       )}
+      <EpistemicLists model={epistemicVm} />
       <p style={{ marginTop: "1.25rem" }}>
         <Link href={`/intake/${sessionId}/recap`}>View intake recap</Link>
       </p>

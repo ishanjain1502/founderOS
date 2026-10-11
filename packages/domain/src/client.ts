@@ -79,3 +79,13 @@ export {
   demoObservedIdentityKey,
   projectIntakeToEpistemic,
 } from "./project-intake-to-epistemic";
+
+export {
+  buildEpistemicViewModel,
+  EMPTY_OBSERVED_COPY,
+  vendorChipLabel,
+  type EpistemicViewModel,
+  type ObservedRowView,
+  type AssumptionRowView,
+  type StatementRowView,
+} from "./epistemic-view";
