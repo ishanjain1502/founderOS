@@ -71,6 +71,10 @@ export type SessionStore = {
   updateIntake(id: string, intake: IntakeDraftPartial): SessionRecord;
   approveSession(id: string): SessionRecord;
   startSession(id: string): SessionRecord;
+  applyEpistemicSnapshot(
+    id: string,
+    snapshot: EpistemicSnapshot,
+  ): SessionRecord;
 };
 
 const SELECT_COLUMNS = `id, contract_version, mode, status, question_revision, intake_json,
@@ -212,6 +216,21 @@ export function openSessionStore(filePath: string): SessionStore {
          SET status = 'frozen', frozen_at = ?, updated_at = ?, epistemic_json = ?
          WHERE id = ?`,
         ).run(now, now, JSON.stringify(snapshot), id);
+        return rowToRecord(requireRow(db, id));
+      });
+    },
+
+    applyEpistemicSnapshot(id, snapshot) {
+      return withDb(filePath, (db) => {
+        const row = requireRow(db, id);
+        if (row.status !== "frozen") {
+          throw new FrozenSessionError();
+        }
+        const parsed = epistemicSnapshotSchema.parse(snapshot);
+        const now = new Date().toISOString();
+        db.prepare(
+          `UPDATE sessions SET epistemic_json = ?, updated_at = ? WHERE id = ?`,
+        ).run(JSON.stringify(parsed), now, id);
         return rowToRecord(requireRow(db, id));
       });
     },

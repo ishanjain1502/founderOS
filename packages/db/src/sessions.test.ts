@@ -6,6 +6,11 @@ import * as domain from "@ceo-sandbox/domain";
 import { emptyIntakeDraft, isIntakeComplete } from "@ceo-sandbox/domain";
 import { RunMode } from "@ceo-sandbox/domain";
 import {
+  emptyEpistemicSnapshot,
+  EvidenceVendor,
+} from "@ceo-sandbox/domain";
+import { EntitySource } from "@ceo-sandbox/domain/server";
+import {
   EpistemicProjectionError,
   FrozenSessionError,
   openSessionStore,
@@ -132,6 +137,45 @@ describe("openSessionStore", () => {
     db.approveSession(created.id);
     const started = db.startSession(created.id);
     expect(started.epistemic?.evidence).toEqual([]);
+  });
+
+  it("applyEpistemicSnapshot on frozen session persists evidence; draft throws; intake still frozen", () => {
+    const db = store();
+    const created = db.createSession({
+      mode: RunMode.Full,
+      intake: completeDemoLike(RunMode.Full),
+    });
+    expect(() =>
+      db.applyEpistemicSnapshot(created.id, emptyEpistemicSnapshot()),
+    ).toThrow(FrozenSessionError);
+
+    db.approveSession(created.id);
+    const started = db.startSession(created.id);
+    expect(started.epistemic?.evidence).toEqual([]);
+
+    const updated = structuredClone(started.epistemic!);
+    updated.evidence.push({
+      id: "00000000-0000-4000-8000-000000000099",
+      contractVersion: 1,
+      createdAt: started.updatedAt,
+      source: EntitySource.Import,
+      sessionId: created.id,
+      vendor: EvidenceVendor.Crustdata,
+      summary: "Test competitor",
+      retrievedAt: started.updatedAt,
+      identityKey: "fallback:crustdata:test:1",
+      fieldPaths: ["basic_info.name"],
+    });
+
+    const applied = db.applyEpistemicSnapshot(created.id, updated);
+    expect(applied.epistemic?.evidence).toHaveLength(1);
+    expect(applied.status).toBe("frozen");
+    expect(applied.intake).toEqual(started.intake);
+    expect(applied.frozenAt).toBe(started.frozenAt);
+
+    expect(() =>
+      db.updateIntake(created.id, applied.intake),
+    ).toThrow(FrozenSessionError);
   });
 
   it("startSession throws EpistemicProjectionError and leaves session approved when validation fails", () => {
