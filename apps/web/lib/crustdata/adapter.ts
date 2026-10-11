@@ -106,6 +106,15 @@ function parseSearchCompanies(payload: unknown): CrustdataCompany[] {
     .filter((row): row is CrustdataCompany => row !== null);
 }
 
+/** SP-05 §6.1: lowercase, strip leading www. */
+export function normalizeHost(host: string): string {
+  let normalized = host.trim().toLowerCase();
+  if (normalized.startsWith("www.")) {
+    normalized = normalized.slice(4);
+  }
+  return normalized;
+}
+
 function parseIdentifyMatch(
   payload: unknown,
   domain: string,
@@ -117,21 +126,25 @@ function parseIdentifyMatch(
   if (!Array.isArray(matches)) {
     return null;
   }
-  const normalizedDomain = domain.toLowerCase();
+  const normalizedDomain = normalizeHost(domain);
   for (const match of matches) {
     if (!match || typeof match !== "object") {
       continue;
     }
     const row = match as Record<string, unknown>;
-    const primaryDomain = String(row.primary_domain ?? "").toLowerCase();
+    const primaryDomainRaw = String(row.primary_domain ?? "");
+    const normalizedPrimary = normalizeHost(primaryDomainRaw);
     const companyIdRaw = row.crustdata_company_id;
     if (companyIdRaw === undefined || companyIdRaw === null) {
       continue;
     }
-    if (primaryDomain === normalizedDomain || primaryDomain.length === 0) {
+    if (normalizedPrimary.length === 0) {
+      continue;
+    }
+    if (normalizedPrimary === normalizedDomain) {
       return {
         companyId: String(companyIdRaw),
-        primaryDomain: String(row.primary_domain ?? domain),
+        primaryDomain: primaryDomainRaw,
       };
     }
   }

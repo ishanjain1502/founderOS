@@ -75,4 +75,62 @@ describe("createLiveAdapter", () => {
     expect(fetchFn).toHaveBeenCalledTimes(1);
     expect(sleep).not.toHaveBeenCalled();
   });
+
+  it("identify returns null when match has empty primary_domain", async () => {
+    const fetchFn = vi.fn(async () =>
+      new Response(
+        JSON.stringify({
+          matches: [{ crustdata_company_id: "co-1", primary_domain: "" }],
+        }),
+        { status: 200 },
+      ),
+    );
+    const adapter = createLiveAdapter({ apiKey: "test-key", fetchFn });
+    await expect(adapter.identify("example.com")).resolves.toBeNull();
+  });
+
+  it("identify matches intake www.example.com to API example.com", async () => {
+    const fetchFn = vi.fn(async () =>
+      new Response(
+        JSON.stringify({
+          matches: [{ crustdata_company_id: "co-1", primary_domain: "example.com" }],
+        }),
+        { status: 200 },
+      ),
+    );
+    const adapter = createLiveAdapter({ apiKey: "test-key", fetchFn });
+    await expect(adapter.identify("www.example.com")).resolves.toEqual({
+      companyId: "co-1",
+      primaryDomain: "example.com",
+    });
+  });
+
+  it("identify matches intake example.com to API www.example.com", async () => {
+    const fetchFn = vi.fn(async () =>
+      new Response(
+        JSON.stringify({
+          matches: [{ crustdata_company_id: "co-2", primary_domain: "www.example.com" }],
+        }),
+        { status: 200 },
+      ),
+    );
+    const adapter = createLiveAdapter({ apiKey: "test-key", fetchFn });
+    await expect(adapter.identify("example.com")).resolves.toEqual({
+      companyId: "co-2",
+      primaryDomain: "www.example.com",
+    });
+  });
+
+  it("identify returns null when primary_domain host differs from intake", async () => {
+    const fetchFn = vi.fn(async () =>
+      new Response(
+        JSON.stringify({
+          matches: [{ crustdata_company_id: "co-3", primary_domain: "other.com" }],
+        }),
+        { status: 200 },
+      ),
+    );
+    const adapter = createLiveAdapter({ apiKey: "test-key", fetchFn });
+    await expect(adapter.identify("example.com")).resolves.toBeNull();
+  });
 });
