@@ -6,6 +6,15 @@ export const FORBIDDEN_PHRASES = [
   "will generate",
   "proven demand",
   "real market proof",
+  "definitely",
+  "customers will buy",
+  "guaranteed revenue",
+  "will hit $",
+  "1000 real",
+  "1,000 real",
+  "proves demand",
+  "proves customer demand",
+  "real interviews",
 ] as const;
 
 export type ForbiddenPhrase = (typeof FORBIDDEN_PHRASES)[number];

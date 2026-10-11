@@ -10,6 +10,15 @@ describe("FORBIDDEN_PHRASES", () => {
       "will generate",
       "proven demand",
       "real market proof",
+      "definitely",
+      "customers will buy",
+      "guaranteed revenue",
+      "will hit $",
+      "1000 real",
+      "1,000 real",
+      "proves demand",
+      "proves customer demand",
+      "real interviews",
     ]);
   });
 });
@@ -33,6 +42,12 @@ describe("findForbiddenPhrases", () => {
   it("matches case-insensitively", () => {
     expect(findForbiddenPhrases("This FORECAST is not allowed.")).toContain(
       "forecast",
+    );
+  });
+
+  it("flags competitor-proves-demand wording", () => {
+    expect(findForbiddenPhrases("This proves customer demand for our add-on.")).toContain(
+      "proves customer demand",
     );
   });
 
