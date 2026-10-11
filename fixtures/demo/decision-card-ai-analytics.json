@@ -6,6 +6,11 @@
   "company": {
     "name": "Example SaaS Co",
     "productSummary": "B2B workflow SaaS for mid-market teams; core product is project and ops tracking.",
+    "category": "Workflow / project operations SaaS",
+    "primaryBuyer": "Mid-market operations or team lead",
+    "jobToBeDone": "Track projects and operations in one workspace",
+    "deliveryModel": "saas",
+    "sizeBand": "mid",
     "customerCount": 1000,
     "cashUsd": 2000000,
     "mrrUsd": 80000,
@@ -17,6 +22,8 @@
     "packaging": "Premium add-on, per-seat monthly"
   },
   "goals": ["Increase ARPU", "Win enterprise expansion deals"],
+  "goalChips": ["revenue", "expansion", "enterprise"],
+  "primaryGoalChip": "expansion",
   "constraints": {
     "budgetUsd": 250000,
     "executionMonths": 4,

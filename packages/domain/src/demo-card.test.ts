@@ -20,4 +20,23 @@ describe("loadDemoCard", () => {
   it("rejects missing decisionQuestion", () => {
     expect(() => loadDemoCard({ id: "x" })).toThrow(/decisionQuestion/);
   });
+
+  it("requires Q20 company fields and goal chips", () => {
+    const raw = JSON.parse(
+      readFileSync(
+        join(__dirname, "../../../fixtures/demo/decision-card-ai-analytics.json"),
+        "utf8",
+      ),
+    );
+    const card = loadDemoCard(raw);
+    expect(card.company.category).toBe("Workflow / project operations SaaS");
+    expect(card.company.primaryBuyer).toBe("Mid-market operations or team lead");
+    expect(card.company.jobToBeDone).toBe(
+      "Track projects and operations in one workspace",
+    );
+    expect(card.company.deliveryModel).toBe("saas");
+    expect(card.company.sizeBand).toBe("mid");
+    expect(card.goalChips).toEqual(["revenue", "expansion", "enterprise"]);
+    expect(card.primaryGoalChip).toBe("expansion");
+  });
 });

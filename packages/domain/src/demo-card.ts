@@ -1,6 +1,13 @@
+import { GoalChip, SizeBand } from "./contracts/intake";
+
 export interface DemoCompany {
   name: string;
   productSummary: string;
+  category: string;
+  primaryBuyer: string;
+  jobToBeDone: string;
+  deliveryModel: "saas";
+  sizeBand: SizeBand;
   customerCount: number;
   cashUsd: number;
   mrrUsd: number;
@@ -53,6 +60,8 @@ export interface DemoDecisionCard {
   company: DemoCompany;
   feature: DemoFeature;
   goals: string[];
+  goalChips: GoalChip[];
+  primaryGoalChip: GoalChip;
   constraints: DemoConstraints;
   targetMarketBehavior: string;
   panelSeed: number;
@@ -124,6 +133,69 @@ function requireStringArray(
   return value;
 }
 
+const SIZE_BAND_VALUES = new Set<string>(Object.values(SizeBand));
+const GOAL_CHIP_VALUES = new Set<string>(Object.values(GoalChip));
+
+function requireSizeBand(
+  obj: Record<string, unknown>,
+  key: string,
+  path = key,
+): SizeBand {
+  const value = requireString(obj, key, path);
+  if (!SIZE_BAND_VALUES.has(value)) {
+    throw new Error(`Invalid sizeBand for ${path}`);
+  }
+  return value as SizeBand;
+}
+
+function requireDeliveryModel(
+  obj: Record<string, unknown>,
+  key: string,
+  path = key,
+): "saas" {
+  const value = requireString(obj, key, path);
+  if (value !== "saas") {
+    throw new Error(`Invalid deliveryModel for ${path}`);
+  }
+  return "saas";
+}
+
+function requireGoalChips(
+  obj: Record<string, unknown>,
+  key: string,
+  path = key,
+): GoalChip[] {
+  const value = requireField(obj, key, path);
+  if (!Array.isArray(value) || value.length === 0) {
+    throw new Error(`Invalid goal chips for ${path}`);
+  }
+  const chips: GoalChip[] = [];
+  for (const item of value) {
+    if (typeof item !== "string" || !GOAL_CHIP_VALUES.has(item)) {
+      throw new Error(`Invalid goal chips for ${path}`);
+    }
+    chips.push(item as GoalChip);
+  }
+  return chips;
+}
+
+function requirePrimaryGoalChip(
+  obj: Record<string, unknown>,
+  key: string,
+  goalChips: GoalChip[],
+  path = key,
+): GoalChip {
+  const value = requireString(obj, key, path);
+  if (!GOAL_CHIP_VALUES.has(value)) {
+    throw new Error(`Invalid primaryGoalChip for ${path}`);
+  }
+  const chip = value as GoalChip;
+  if (!goalChips.includes(chip)) {
+    throw new Error(`primaryGoalChip must be in goalChips`);
+  }
+  return chip;
+}
+
 function parseCompany(raw: unknown): DemoCompany {
   if (!isRecord(raw)) {
     throw new Error("Invalid company");
@@ -131,6 +203,11 @@ function parseCompany(raw: unknown): DemoCompany {
   return {
     name: requireString(raw, "name", "company.name"),
     productSummary: requireString(raw, "productSummary", "company.productSummary"),
+    category: requireString(raw, "category", "company.category"),
+    primaryBuyer: requireString(raw, "primaryBuyer", "company.primaryBuyer"),
+    jobToBeDone: requireString(raw, "jobToBeDone", "company.jobToBeDone"),
+    deliveryModel: requireDeliveryModel(raw, "deliveryModel", "company.deliveryModel"),
+    sizeBand: requireSizeBand(raw, "sizeBand", "company.sizeBand"),
     customerCount: requireNumber(raw, "customerCount", "company.customerCount"),
     cashUsd: requireNumber(raw, "cashUsd", "company.cashUsd"),
     mrrUsd: requireNumber(raw, "mrrUsd", "company.mrrUsd"),
@@ -262,6 +339,7 @@ export function loadDemoCard(json: unknown): DemoDecisionCard {
   }
 
   const decisionQuestion = requireString(json, "decisionQuestion");
+  const goalChips = requireGoalChips(json, "goalChips");
 
   return {
     id: requireString(json, "id"),
@@ -271,6 +349,8 @@ export function loadDemoCard(json: unknown): DemoDecisionCard {
     company: parseCompany(requireField(json, "company", "company")),
     feature: parseFeature(requireField(json, "feature", "feature")),
     goals: requireStringArray(json, "goals"),
+    goalChips,
+    primaryGoalChip: requirePrimaryGoalChip(json, "primaryGoalChip", goalChips),
     constraints: parseConstraints(requireField(json, "constraints", "constraints")),
     targetMarketBehavior: requireString(json, "targetMarketBehavior"),
     panelSeed: requireNumber(json, "panelSeed"),
