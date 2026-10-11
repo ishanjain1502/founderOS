@@ -1,0 +1,78 @@
+{
+  "session": {
+    "id": "00000000-0000-4000-8000-000000000001",
+    "contractVersion": 1,
+    "createdAt": "2026-01-01T00:00:00.000Z",
+    "source": "system",
+    "mode": "demo"
+  },
+  "decision": {
+    "decisionId": "00000000-0000-4000-8000-000000000002",
+    "sessionId": "00000000-0000-4000-8000-000000000001",
+    "contractVersion": 1,
+    "createdAt": "2026-01-01T00:00:00.000Z",
+    "source": "user",
+    "questionText": "Should we launch AI-powered analytics as a premium add-on?",
+    "questionRevision": 1
+  },
+  "companyProfile": {
+    "id": "00000000-0000-4000-8000-000000000003",
+    "sessionId": "00000000-0000-4000-8000-000000000001",
+    "contractVersion": 1,
+    "createdAt": "2026-01-01T00:00:00.000Z",
+    "source": "import",
+    "name": "Example SaaS Co",
+    "productSummary": "B2B workflow SaaS for mid-market operations teams.",
+    "customerCount": 420,
+    "mrrUsd": 85000,
+    "runwayMonths": 14
+  },
+  "featureProposal": {
+    "id": "00000000-0000-4000-8000-000000000004",
+    "sessionId": "00000000-0000-4000-8000-000000000001",
+    "contractVersion": 1,
+    "createdAt": "2026-01-01T00:00:00.000Z",
+    "source": "user",
+    "title": "AI analytics add-on",
+    "description": "Premium AI-powered analytics layer on existing project data.",
+    "changeType": "feature"
+  },
+  "panelStimulus": [],
+  "archetypes": [],
+  "scenarios": [
+    {
+      "id": "00000000-0000-4000-8000-000000000010",
+      "sessionId": "00000000-0000-4000-8000-000000000001",
+      "contractVersion": 1,
+      "createdAt": "2026-01-01T00:00:00.000Z",
+      "source": "import",
+      "strategyKind": "pilot",
+      "scope": "Mid-market workflow teams evaluating an analytics upsell",
+      "label": "Pilot launch",
+      "assumptionRefs": ["00000000-0000-4000-8000-000000000050"],
+      "requiresFinance": true
+    }
+  ],
+  "evidence": [],
+  "claims": [
+    {
+      "id": "00000000-0000-4000-8000-000000000050",
+      "sessionId": "00000000-0000-4000-8000-000000000001",
+      "contractVersion": 1,
+      "createdAt": "2026-01-01T00:00:00.000Z",
+      "source": "import",
+      "kind": "assumption",
+      "statement": "Pilot adoption reaches 18% of existing customers in year one.",
+      "numeric": { "unit": "percent", "value": 18 },
+      "rationaleTag": "demo_fixture"
+    }
+  ],
+  "runs": [],
+  "codeImpactArtifacts": [],
+  "panelRuns": [],
+  "respondentEvaluations": [],
+  "segmentAggregates": [],
+  "financialRunResults": [],
+  "recommendations": [],
+  "revisions": []
+}
