@@ -10,6 +10,8 @@ Autonomous CEO Decision Sandbox monorepo.
 - [SP-02 implementation plan](docs/superpowers/plans/2026-10-11-sp02-domain-contracts.md)
 - [SP-03 decision intake and company context (spec)](.docs/specs/SP-03-decision-intake-and-company-context.md)
 - [SP-03 implementation plan](docs/superpowers/plans/2026-10-11-sp03-intake-and-company-context.md)
+- [SP-04 evidence, assumptions, and uncertainty (spec)](.docs/specs/SP-04-evidence-assumptions-uncertainty.md)
+- [SP-04 implementation plan](docs/superpowers/plans/2026-10-12-sp04-evidence-assumptions-uncertainty.md)
 - [Subproblem index](.docs/subproblems/00-index.md)
 - [Project initialization](.docs/init.md)
 
