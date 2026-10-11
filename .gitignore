@@ -1,2 +1,4 @@
 .docs/init.md
 .env
+node_modules/
+.superpowers/
