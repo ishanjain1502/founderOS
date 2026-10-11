@@ -10,6 +10,14 @@ export { RunMode, parseRunMode } from "./run-mode";
 export { buildCrustdataQuery, type BuildCrustdataQueryInput } from "./crustdata-query";
 
 export {
+  mapCrustdataCompanyToEvidence,
+  isDemandAdjacent,
+  shouldProposeAnalyticsHypothesis,
+  type CrustdataCompany,
+  type MapCrustdataCompanyContext,
+} from "./crustdata-map";
+
+export {
   FORBIDDEN_PHRASES,
   findForbiddenPhrases,
   type ForbiddenPhrase,

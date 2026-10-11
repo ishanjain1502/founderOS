@@ -46,6 +46,7 @@ export const evidenceSchema = baseEntitySchema
     retrievedAt: z.string().datetime(),
     sourceTimeUnknown: z.boolean().optional(),
     vendorTimestamp: z.string().optional(),
+    rawPayloadRef: z.string().min(1).optional(),
   })
   .refine(hasExternalIdentity, {
     message:
