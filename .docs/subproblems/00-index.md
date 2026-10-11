@@ -19,6 +19,7 @@ This folder decomposes that spec into subproblems that **must** be solved before
 | SP | Spec | Plan |
 |----|------|------|
 | SP-01 | `.docs/specs/SP-01-scope-success-nongoals.md` | `docs/superpowers/plans/2026-10-11-sp01-scope-foundation.md` |
+| SP-02 | `.docs/specs/SP-02-shared-domain-contracts.md` | `docs/superpowers/plans/2026-10-11-sp02-domain-contracts.md` |
 
 Subproblem question docs remain the Q&A source of truth; specs consolidate locked answers for builders.
 
