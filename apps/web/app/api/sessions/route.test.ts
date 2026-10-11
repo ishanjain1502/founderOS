@@ -2,7 +2,34 @@ import { mkdtempSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterEach, describe, expect, it } from "vitest";
-import { LAST_SESSION_COOKIE, RunMode } from "@ceo-sandbox/domain";
+import {
+  emptyIntakeDraft,
+  LAST_SESSION_COOKIE,
+  RunMode,
+} from "@ceo-sandbox/domain";
+import { getStore } from "@/lib/session-store";
+
+function completeFullIntake() {
+  const d = emptyIntakeDraft(RunMode.Full);
+  d.company = {
+    name: "Acme",
+    productSummary: "B2B SaaS",
+    category: "Workflow",
+    primaryBuyer: "Ops lead",
+    jobToBeDone: "Track work",
+    deliveryModel: "saas",
+    sizeBand: "mid",
+  };
+  d.market = { targetMarketBehavior: "SMB and enterprise buyers" };
+  d.constraints = { budgetUsd: 1000, executionMonths: 3 };
+  d.feature = {
+    description: "AI add-on",
+    changeType: "feature",
+  };
+  d.decision = { questionText: "Should we launch it?" };
+  d.financials = { provideLater: true };
+  return d;
+}
 
 describe("POST /api/sessions", () => {
   const dirs: string[] = [];
@@ -49,5 +76,35 @@ describe("POST /api/sessions", () => {
     expect(patched.status).toBe(200);
     const patchedBody = await patched.json();
     expect(patchedBody.intake.company.name).toBe("Acme");
+
+    const invalidPatch = await PATCH(
+      new Request("http://localhost", {
+        method: "PATCH",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({
+          intake: { decision: { questionText: "x".repeat(501) } },
+        }),
+      }),
+      { params: Promise.resolve({ id: body.id }) },
+    );
+    expect(invalidPatch.status).toBe(400);
+    const invalidBody = await invalidPatch.json();
+    expect(invalidBody.errors).toBeDefined();
+
+    const store = getStore();
+    store.updateIntake(body.id, completeFullIntake());
+    store.approveSession(body.id);
+    store.startSession(body.id);
+
+    const frozenPatch = await PATCH(
+      new Request("http://localhost", {
+        method: "PATCH",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ intake: { company: { name: "Frozen edit" } } }),
+      }),
+      { params: Promise.resolve({ id: body.id }) },
+    );
+    expect(frozenPatch.status).toBe(409);
+    expect(await frozenPatch.json()).toEqual({ error: "frozen" });
   });
 });

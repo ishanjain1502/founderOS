@@ -11,6 +11,8 @@ import {
 import { sessionToJson } from "@/lib/session-response";
 import { getStore } from "@/lib/session-store";
 
+export const runtime = "nodejs";
+
 const patchBodySchema = z.object({
   intake: z.record(z.unknown()).optional(),
 });
@@ -84,6 +86,9 @@ export async function PATCH(
   } catch (error) {
     if (error instanceof FrozenSessionError) {
       return frozenResponse();
+    }
+    if (error instanceof z.ZodError) {
+      return zodErrorResponse(error);
     }
     throw error;
   }

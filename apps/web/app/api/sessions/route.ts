@@ -19,6 +19,8 @@ import { setLastSessionCookie } from "@/lib/session-cookie";
 import { sessionToJson } from "@/lib/session-response";
 import { getStore } from "@/lib/session-store";
 
+export const runtime = "nodejs";
+
 const createBodySchema = z.object({
   mode: z.string(),
   demoCardId: z.string().optional(),

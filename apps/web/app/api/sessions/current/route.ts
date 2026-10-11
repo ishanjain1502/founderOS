@@ -4,6 +4,8 @@ import { sessionToJson } from "@/lib/session-response";
 import { getStore } from "@/lib/session-store";
 import { NextResponse } from "next/server";
 
+export const runtime = "nodejs";
+
 export async function GET(request: Request) {
   const sessionId = readLastSessionCookie(request);
   if (!sessionId) {
