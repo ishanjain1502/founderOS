@@ -150,6 +150,67 @@ describe("buildEpistemicViewModel", () => {
     expect(vm.observed).toEqual([]);
   });
 
+  it("surfaces recorded banner when sourceMode is recorded", () => {
+    const snap = demoLikeSnapshot();
+    snap.marketResearch = {
+      crustdata: {
+        status: "ran",
+        query: "analytics competitors",
+        httpCallCount: 1,
+        usedFallback: false,
+        sourceMode: "recorded",
+        ranAt: NOW,
+      },
+    };
+    const vm = buildEpistemicViewModel(snap);
+    expect(vm.recordedBanner).toBe(
+      "Recorded Crustdata response (dev/demo)",
+    );
+    expect(vm.fallbackBanner).toBeNull();
+    expect(vm.querySubmitted).toBe("analytics competitors");
+  });
+
+  it("surfaces fallback banner when sourceMode is fallback", () => {
+    const snap = demoLikeSnapshot();
+    snap.marketResearch = {
+      crustdata: {
+        status: "fallback",
+        query: "competitors in SaaS",
+        httpCallCount: 0,
+        usedFallback: true,
+        sourceMode: "fallback",
+        ranAt: NOW,
+      },
+    };
+    const vm = buildEpistemicViewModel(snap);
+    expect(vm.fallbackBanner).toBe(
+      "Fallback market context (not Crustdata)",
+    );
+    expect(vm.recordedBanner).toBeNull();
+    expect(vm.querySubmitted).toBe("competitors in SaaS");
+  });
+
+  it("idle or missing marketResearch → banners and query null", () => {
+    const idleSnap = demoLikeSnapshot();
+    idleSnap.marketResearch = {
+      crustdata: {
+        status: "idle",
+        query: "",
+        httpCallCount: 0,
+        usedFallback: false,
+        sourceMode: "none",
+      },
+    };
+    expect(buildEpistemicViewModel(idleSnap).recordedBanner).toBeNull();
+    expect(buildEpistemicViewModel(idleSnap).fallbackBanner).toBeNull();
+    expect(buildEpistemicViewModel(idleSnap).querySubmitted).toBeNull();
+
+    const noResearch = buildEpistemicViewModel(demoLikeSnapshot());
+    expect(noResearch.recordedBanner).toBeNull();
+    expect(noResearch.fallbackBanner).toBeNull();
+    expect(noResearch.querySubmitted).toBeNull();
+  });
+
   it("static copy does not trip forbidden phrases", () => {
     const strings = [
       EMPTY_OBSERVED_COPY,

@@ -10,6 +10,7 @@ import {
   type IntakeDraftPartial,
 } from "@ceo-sandbox/domain";
 import { mainStyle } from "@/components/intake/steps/shared";
+import { CrustdataResearch } from "@/components/session/CrustdataResearch";
 import { EpistemicLists } from "@/components/session/EpistemicLists";
 
 type SessionPayload = {
@@ -23,11 +24,24 @@ export default function SessionPlaceholderPage() {
   const params = useParams<{ sessionId: string }>();
   const sessionId = params.sessionId;
   const [intake, setIntake] = useState<IntakeDraftPartial | null>(null);
+  const [sessionStatus, setSessionStatus] = useState<string>("");
+  const [epistemic, setEpistemic] = useState<EpistemicSnapshot | null>(null);
   const [epistemicVm, setEpistemicVm] = useState(
     buildEpistemicViewModel(null),
   );
   const [loading, setLoading] = useState(true);
   const [missing, setMissing] = useState(false);
+
+  async function refreshSession() {
+    if (!sessionId || typeof sessionId !== "string") return;
+    const res = await fetch(`/api/sessions/${sessionId}`);
+    if (!res.ok) return;
+    const body = (await res.json()) as SessionPayload;
+    setIntake(body.intake);
+    setSessionStatus(body.status);
+    setEpistemic(body.epistemic ?? null);
+    setEpistemicVm(buildEpistemicViewModel(body.epistemic ?? null));
+  }
 
   useEffect(() => {
     if (!sessionId) return;
@@ -48,6 +62,8 @@ export default function SessionPlaceholderPage() {
       }
       const body = (await res.json()) as SessionPayload;
       setIntake(body.intake);
+      setSessionStatus(body.status);
+      setEpistemic(body.epistemic ?? null);
       setEpistemicVm(buildEpistemicViewModel(body.epistemic ?? null));
       setLoading(false);
     })();
@@ -102,6 +118,15 @@ export default function SessionPlaceholderPage() {
           </span>
         </p>
       )}
+      <CrustdataResearch
+        sessionId={sessionId}
+        sessionStatus={sessionStatus}
+        crustdataStatus={epistemic?.marketResearch?.crustdata.status}
+        recordedBanner={epistemicVm.recordedBanner}
+        fallbackBanner={epistemicVm.fallbackBanner}
+        querySubmitted={epistemicVm.querySubmitted}
+        onComplete={() => void refreshSession()}
+      />
       <EpistemicLists model={epistemicVm} />
       <p style={{ marginTop: "1.25rem" }}>
         <Link href={`/intake/${sessionId}/recap`}>View intake recap</Link>

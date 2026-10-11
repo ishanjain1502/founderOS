@@ -20,6 +20,17 @@ const chipStyle = {
 const INFERRED_NOT_EVIDENCE_COPY =
   "These inference statements are not Evidence.";
 
+const CRUSTDATA_CHIP = "Observed via Crustdata";
+const CRUSTDATA_FOOTER = "Data from Crustdata.";
+
+function summaryBullets(summary: string): string[] {
+  return summary
+    .split("\n")
+    .map((line) => line.trim())
+    .filter((line) => line.length > 0)
+    .slice(0, 3);
+}
+
 const sectionStyle = { marginTop: "1.25rem" } as const;
 const rowStyle = {
   marginTop: "0.75rem",
@@ -50,22 +61,51 @@ export function EpistemicLists({ model }: { model: EpistemicViewModel }) {
         {model.emptyObserved ? (
           <p>{EMPTY_OBSERVED_COPY}</p>
         ) : (
-          model.observed.map((row, i) => (
-            <div key={i} style={rowStyle}>
-              <p style={{ margin: 0 }}>{row.summary}</p>
-              <p style={{ margin: "0.35rem 0 0", fontSize: "0.85rem" }}>
-                <strong>{epistemicLabel(EpistemicKind.Observed)}</strong>
-                {" · "}
-                {row.retrievedAt}
-                <span style={chipStyle}>{row.vendorChip}</span>
-              </p>
-              {row.disclaimer ? (
+          model.observed.map((row, i) => {
+            const isCrustdata = row.vendorChip === CRUSTDATA_CHIP;
+            const bullets = isCrustdata ? summaryBullets(row.summary) : null;
+            return (
+              <div key={i} style={rowStyle}>
+                {bullets && bullets.length > 0 ? (
+                  <ul style={{ margin: 0, paddingLeft: "1.25rem" }}>
+                    {bullets.map((line, j) => (
+                      <li key={j}>{line}</li>
+                    ))}
+                  </ul>
+                ) : (
+                  <p style={{ margin: 0 }}>{row.summary}</p>
+                )}
                 <p style={{ margin: "0.35rem 0 0", fontSize: "0.85rem" }}>
-                  {row.disclaimer}
+                  <strong>{epistemicLabel(EpistemicKind.Observed)}</strong>
+                  {" · "}
+                  {row.retrievedAt}
+                  {row.crustdataId ? (
+                    <>
+                      {" · "}
+                      <span>id {row.crustdataId}</span>
+                    </>
+                  ) : null}
+                  <span style={chipStyle}>{row.vendorChip}</span>
                 </p>
-              ) : null}
-            </div>
-          ))
+                {isCrustdata ? (
+                  <p
+                    style={{
+                      margin: "0.35rem 0 0",
+                      fontSize: "0.85rem",
+                      color: "#555",
+                    }}
+                  >
+                    {CRUSTDATA_FOOTER}
+                  </p>
+                ) : null}
+                {row.disclaimer ? (
+                  <p style={{ margin: "0.35rem 0 0", fontSize: "0.85rem" }}>
+                    {row.disclaimer}
+                  </p>
+                ) : null}
+              </div>
+            );
+          })
         )}
       </section>
 
