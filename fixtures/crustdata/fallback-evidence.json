@@ -1,0 +1,10 @@
+{
+  "companies": [
+    {
+      "crustdataCompanyId": "fallback-1",
+      "name": "Example workflow vendor",
+      "description": "Illustrative fallback profile",
+      "fieldPaths": ["basic_info.name"]
+    }
+  ]
+}

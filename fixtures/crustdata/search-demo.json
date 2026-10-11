@@ -1,0 +1,49 @@
+{
+  "companies": [
+    {
+      "crustdata_company_id": "9001001",
+      "basic_info": {
+        "name": "Nordvale Analytics",
+        "website": "https://nordvale-analytics.example",
+        "description": "Product analytics and funnel reporting for B2B SaaS teams."
+      },
+      "taxonomy": {
+        "professional_network_industry": "Software Development"
+      },
+      "metadata": {
+        "updated_at": "2025-09-01T12:00:00Z",
+        "indexed_at": "2025-09-02T08:00:00Z"
+      }
+    },
+    {
+      "crustdata_company_id": "9001002",
+      "basic_info": {
+        "name": "Prism Intelligence Labs",
+        "website": "https://prism-intelligence.example",
+        "description": "Revenue intelligence workspace for mid-market finance leaders."
+      },
+      "taxonomy": {
+        "professional_network_industry": "Business Intelligence Platforms"
+      },
+      "metadata": {
+        "updated_at": "2025-09-10T09:30:00Z",
+        "indexed_at": "2025-09-11T14:00:00Z"
+      }
+    },
+    {
+      "crustdata_company_id": "9001003",
+      "basic_info": {
+        "name": "Loopforge Workflows",
+        "website": "https://loopforge-workflows.example",
+        "description": "No-code workflow automation for operations teams."
+      },
+      "taxonomy": {
+        "professional_network_industry": "Technology, Information and Internet"
+      },
+      "metadata": {
+        "updated_at": "2025-08-20T16:45:00Z",
+        "indexed_at": "2025-08-21T10:15:00Z"
+      }
+    }
+  ]
+}
