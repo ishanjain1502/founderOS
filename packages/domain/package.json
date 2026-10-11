@@ -2,7 +2,9 @@
   "name": "@ceo-sandbox/domain",
   "private": true,
   "exports": {
-    ".": "./src/index.ts"
+    ".": "./src/client.ts",
+    "./server": "./src/server.ts",
+    "./node": "./src/index.ts"
   },
   "scripts": {
     "test": "vitest run"
