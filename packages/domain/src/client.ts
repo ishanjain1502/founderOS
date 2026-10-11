@@ -25,6 +25,11 @@ export {
 } from "./demo-card";
 
 export {
+  PrimarySegment,
+  FeatureChangeType,
+} from "./contracts/enums";
+
+export {
   LAST_SESSION_COOKIE,
   SHORT_TEXT_MAX,
   QUESTION_MAX,
