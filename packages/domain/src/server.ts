@@ -24,3 +24,4 @@ export * from "./contracts/scenario";
 export * from "./contracts/finance";
 export * from "./contracts/run";
 export * from "./contracts/recommendation";
+export * from "./contracts/intake";
