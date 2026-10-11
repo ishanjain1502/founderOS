@@ -7,6 +7,12 @@ export {
 export { RunMode, parseRunMode } from "./run-mode";
 
 export {
+  FORBIDDEN_PHRASES,
+  findForbiddenPhrases,
+  type ForbiddenPhrase,
+} from "./forbidden-phrases";
+
+export {
   type DemoCompany,
   type DemoConstraints,
   type DemoDecisionCard,
