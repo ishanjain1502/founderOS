@@ -10,6 +10,8 @@ Use after a **Demo mode** or **Full mode** run. A stranger should be able to sco
 
 ## B. Minimum sequence (Demo mode, ~3–5 min)
 
+- [ ] Demo card → wizard → recap → Start investigation placeholder
+
 1. [ ] Select demo card → company + feature + constraints visible.
 2. [ ] Connect or confirm codebase / Entire baseline (or labeled Track B).
 3. [ ] Run completes without hiding integration failures.
