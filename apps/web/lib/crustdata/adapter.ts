@@ -168,6 +168,7 @@ function parseEnrichCompany(payload: unknown): CrustdataCompany | null {
 
 export function createFixtureAdapter(rootDir: string): CrustdataAdapter {
   return {
+    kind: "fixture",
     async identify(domain: string) {
       const payload = readJsonFile(join(rootDir, "identify-crustdata.json"));
       return parseIdentifyMatch(payload, domain);
@@ -204,6 +205,7 @@ export function createLiveAdapter(opts: LiveAdapterOptions): CrustdataAdapter {
   }
 
   return {
+    kind: "live",
     async identify(domain: string) {
       const response = await post("/company/identify", {
         domains: [domain],

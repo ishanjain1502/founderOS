@@ -1,6 +1,7 @@
 import type { CrustdataCompany } from "@ceo-sandbox/domain";
 
 export type CrustdataAdapter = {
+  kind: "live" | "fixture";
   identify(
     domain: string,
   ): Promise<{ companyId: string; primaryDomain: string } | null>;
