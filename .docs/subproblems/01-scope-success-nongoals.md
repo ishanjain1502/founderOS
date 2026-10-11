@@ -189,3 +189,11 @@ the answer itself, init.md is overview and guiding source
 
 **SP-01-Q33.** Do you want a single running “decisions log,” or answers left under each question ID?
 answer left under each question id
+
+### Stop-rule and checklist
+
+**SP-01-Q34.** What will you refuse to build even if time remains (stop-rule beyond init.md out-of-scope)?
+No multi-tenant auth beyond demo needs, arbitrary CRM/ERP connectors, real customer outreach or ad automation, custom ML for personas, or mobile-native clients until the core investigate→simulate→model→compare→decide→revise loop ships. Consolidated in `.docs/specs/SP-01-scope-success-nongoals.md` §9.
+
+**SP-01-Q35.** Where does the stranger-usable success checklist live, and who maintains it?
+`.docs/specs/SP-01-success-checklist.md`, updated when demo flow or must-haves change; implementation plan SP-01 Task 2 owns initial version.
