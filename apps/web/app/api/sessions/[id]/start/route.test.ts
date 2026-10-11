@@ -1,8 +1,10 @@
 import { mkdtempSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { afterEach, describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
+import { EpistemicProjectionError } from "@ceo-sandbox/db";
 import { emptyIntakeDraft, RunMode } from "@ceo-sandbox/domain";
+import * as sessionStore from "@/lib/session-store";
 
 function completeDemoLike(mode: typeof RunMode.Demo) {
   const d = emptyIntakeDraft(mode);
@@ -85,5 +87,30 @@ describe("POST /api/sessions/:id/start", () => {
     expect((await afterStart.json()).epistemic?.evidence[0]?.vendor).toBe(
       "demo_fixture",
     );
+  });
+
+  it("returns 500 epistemic_projection_failed when projection validation fails", async () => {
+    const sessionId = "00000000-0000-4000-8000-000000000099";
+    vi.spyOn(sessionStore, "getStore").mockReturnValue({
+      getSession: vi.fn().mockReturnValue({
+        id: sessionId,
+        status: "approved",
+      }),
+      startSession: vi.fn().mockImplementation(() => {
+        throw new EpistemicProjectionError();
+      }),
+    } as ReturnType<typeof sessionStore.getStore>);
+
+    const { POST: start } = await import("./route");
+    const res = await start(new Request("http://localhost", { method: "POST" }), {
+      params: Promise.resolve({ id: sessionId }),
+    });
+    expect(res.status).toBe(500);
+    const body = await res.json();
+    expect(body).toEqual({
+      error: "epistemic_projection_failed",
+      code: "epistemic_projection_failed",
+    });
+    vi.restoreAllMocks();
   });
 });

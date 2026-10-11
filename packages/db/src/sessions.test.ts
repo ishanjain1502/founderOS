@@ -1,10 +1,15 @@
 import { mkdtempSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { describe, it, expect, afterEach } from "vitest";
+import { describe, it, expect, afterEach, vi } from "vitest";
+import * as domain from "@ceo-sandbox/domain";
 import { emptyIntakeDraft, isIntakeComplete } from "@ceo-sandbox/domain";
 import { RunMode } from "@ceo-sandbox/domain";
-import { FrozenSessionError, openSessionStore } from "./sessions";
+import {
+  EpistemicProjectionError,
+  FrozenSessionError,
+  openSessionStore,
+} from "./sessions";
 
 function completeDemoLike(mode: RunMode) {
   const d = emptyIntakeDraft(mode);
@@ -127,5 +132,30 @@ describe("openSessionStore", () => {
     db.approveSession(created.id);
     const started = db.startSession(created.id);
     expect(started.epistemic?.evidence).toEqual([]);
+  });
+
+  it("startSession throws EpistemicProjectionError and leaves session approved when validation fails", () => {
+    const db = store();
+    const created = db.createSession({
+      mode: RunMode.Full,
+      intake: completeDemoLike(RunMode.Full),
+    });
+    db.approveSession(created.id);
+
+    const spy = vi.spyOn(domain, "validateEpistemicSnapshot").mockReturnValue({
+      ok: false,
+      errors: { _: "x" },
+      quarantinedIds: [],
+    });
+
+    try {
+      expect(() => db.startSession(created.id)).toThrow(EpistemicProjectionError);
+      const row = db.getSession(created.id);
+      expect(row?.status).toBe("approved");
+      expect(row?.epistemic).toBeNull();
+      expect(row?.frozenAt).toBeNull();
+    } finally {
+      spy.mockRestore();
+    }
   });
 });

@@ -260,7 +260,12 @@ export function projectIntakeToEpistemic(
     }
   }
 
-  if (typeof intake.feature?.proposedPriceUsd !== "number") {
+  const hasPriceSignal =
+    typeof intake.feature?.proposedPriceUsd === "number" ||
+    hasMapsTo(snap.claims, "price") ||
+    hasMapsTo(snap.claims, "price_per_seat");
+
+  if (!hasPriceSignal) {
     snap.claims.push({
       ...baseClaimFields(ctx, newId()),
       kind: ClaimKind.Unknown,

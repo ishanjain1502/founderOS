@@ -114,4 +114,24 @@ describe("projectIntakeToEpistemic", () => {
     });
     expect(snap.claims.some((c) => c.statement === WTP_UNKNOWN_STATEMENT)).toBe(false);
   });
+
+  it("does not emit WTP Unknown when a price_per_seat assumption exists", () => {
+    const intake = completeIntake(RunMode.Demo);
+    intake.assumptions = [
+      ...(intake.assumptions ?? []),
+      {
+        id: "00000000-0000-4000-8000-000000000051",
+        statement: "Price per seat",
+        numeric: { unit: "usd", value: 25 },
+        rationaleTag: "demo_fixture",
+        mapsTo: "price_per_seat",
+      },
+    ];
+    const snap = projectIntakeToEpistemic(intake, {
+      mode: RunMode.Demo,
+      sessionId: SESSION,
+      now: NOW,
+    });
+    expect(snap.claims.some((c) => c.statement === WTP_UNKNOWN_STATEMENT)).toBe(false);
+  });
 });

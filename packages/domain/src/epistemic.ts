@@ -17,9 +17,9 @@ export function epistemicLabel(kind: EpistemicKind): string {
 
 export const CLAIM_SAFETY_COPY = {
   panelSimulated:
-    "Customer panel results are simulated, not survey data.",
+    "Customer panel results are simulated, not primary research data.",
   financeNotForecast:
-    "Financial figures are illustrative scenarios, not a verified forecast.",
+    "Financial figures are illustrative scenarios, not verified projections.",
   competitorNotDemand:
     "Competitor activity does not prove customer demand for this feature.",
   fallbackBanner:
