@@ -14,7 +14,13 @@ This folder decomposes that spec into subproblems that **must** be solved before
    - **locked answers** on each question line (design pass complete for SP-01–SP-14 as of repo state)
 3. Answer questions by **ID** (example: `SP-06-Q12`). **Bold text after a question ID** is the decision; change only deliberately and keep IDs stable.
 
-No code belongs in this phase.
+## Implementation specs and plans
+
+| SP | Spec | Plan |
+|----|------|------|
+| SP-01 | `.docs/specs/SP-01-scope-success-nongoals.md` | `docs/superpowers/plans/2026-10-11-sp01-scope-foundation.md` |
+
+Subproblem question docs remain the Q&A source of truth; specs consolidate locked answers for builders.
 
 ## What is not assumed
 
