@@ -1,3 +1,4 @@
+import { EpistemicProjectionError } from "@ceo-sandbox/db";
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import { notFoundResponse } from "@/lib/api-errors";
@@ -36,6 +37,15 @@ export async function POST(
   } catch (error) {
     if (error instanceof Error && error.message === "not_approved") {
       return NextResponse.json({ error: "not_approved" }, { status: 400 });
+    }
+    if (error instanceof EpistemicProjectionError) {
+      return NextResponse.json(
+        {
+          error: "epistemic_projection_failed",
+          code: "epistemic_projection_failed",
+        },
+        { status: 500 },
+      );
     }
     throw error;
   }

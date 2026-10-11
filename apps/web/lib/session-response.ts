@@ -5,5 +5,6 @@ export function sessionToJson(record: SessionRecord) {
     id: record.id,
     status: record.status,
     intake: record.intake,
+    epistemic: record.epistemic,
   };
 }

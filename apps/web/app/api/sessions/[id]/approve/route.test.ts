@@ -73,6 +73,8 @@ describe("approve and start", () => {
       params: Promise.resolve({ id: created.id }),
     });
     expect(started.status).toBe(200);
-    expect((await started.json()).status).toBe("frozen");
+    const startedBody = await started.json();
+    expect(startedBody.status).toBe("frozen");
+    expect(startedBody.epistemic?.evidence).toEqual([]);
   });
 });
