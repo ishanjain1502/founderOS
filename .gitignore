@@ -1,4 +1,5 @@
 .docs/init.md
 .env
 node_modules/
+.next/
 .superpowers/
