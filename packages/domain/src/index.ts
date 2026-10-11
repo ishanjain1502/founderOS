@@ -4,6 +4,8 @@ export {
   CLAIM_SAFETY_COPY,
 } from "./epistemic";
 
+export { RunMode, parseRunMode } from "./run-mode";
+
 export {
   type DemoCompany,
   type DemoConstraints,
