@@ -11,11 +11,25 @@ const domainResolve = {
 const nextConfig: NextConfig = {
   transpilePackages: ["@ceo-sandbox/domain", "@ceo-sandbox/db"],
   serverExternalPackages: ["better-sqlite3"],
-  webpack(config) {
+  webpack(config, { isServer }) {
     config.resolve.alias = {
       ...config.resolve.alias,
       ...domainResolve,
     };
+    if (isServer) {
+      config.externals = config.externals ?? [];
+      if (Array.isArray(config.externals)) {
+        config.externals.push(
+          ({ request }: { request?: string }, callback: (err?: Error | null, result?: string) => void) => {
+            if (request === "better-sqlite3") {
+              callback(null, `commonjs ${request}`);
+              return;
+            }
+            callback();
+          },
+        );
+      }
+    }
     return config;
   },
   turbopack: {
