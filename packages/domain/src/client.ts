@@ -70,3 +70,12 @@ export {
   epistemicWarnings,
   type EpistemicSnapshot,
 } from "./contracts/epistemic-snapshot";
+
+export {
+  DEMO_OBSERVED_SUMMARY,
+  DEMO_HYPOTHESIS_STATEMENT,
+  WTP_UNKNOWN_STATEMENT,
+  DEMO_OBSERVED_KEY_SUFFIX,
+  demoObservedIdentityKey,
+  projectIntakeToEpistemic,
+} from "./project-intake-to-epistemic";

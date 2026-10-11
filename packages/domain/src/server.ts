@@ -2,6 +2,14 @@
 export { demoCardToSessionDraft } from "./demo-card-to-draft";
 export { demoCardToIntakeDraft } from "./demo-card-to-intake";
 export { intakeDraftToSessionDraft } from "./intake-to-session-draft";
+export {
+  DEMO_OBSERVED_SUMMARY,
+  DEMO_HYPOTHESIS_STATEMENT,
+  WTP_UNKNOWN_STATEMENT,
+  DEMO_OBSERVED_KEY_SUFFIX,
+  demoObservedIdentityKey,
+  projectIntakeToEpistemic,
+} from "./project-intake-to-epistemic";
 
 export {
   type SessionDraft,
