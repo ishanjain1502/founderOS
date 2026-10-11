@@ -24,9 +24,6 @@ export function emptyEpistemicSnapshot(): EpistemicSnapshot {
 }
 
 function evidenceHasIdentity(row: Evidence): boolean {
-  if (row.quarantine === true) {
-    return true;
-  }
   if (row.externalId && row.externalId.length > 0) {
     return true;
   }
@@ -108,6 +105,9 @@ export function epistemicWarnings(
   }
 
   for (const row of snapshot.evidence) {
+    if (row.quarantine === true) {
+      continue;
+    }
     if (!evidenceHasIdentity(row)) {
       continue;
     }
