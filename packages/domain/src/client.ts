@@ -62,3 +62,11 @@ export {
   type IntakeDraft,
   type IntakeDraftPartial,
 } from "./contracts/intake";
+
+export {
+  epistemicSnapshotSchema,
+  emptyEpistemicSnapshot,
+  validateEpistemicSnapshot,
+  epistemicWarnings,
+  type EpistemicSnapshot,
+} from "./contracts/epistemic-snapshot";
