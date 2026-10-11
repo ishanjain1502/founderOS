@@ -1,6 +1,7 @@
 import { join } from "node:path";
 import { describe, expect, it, vi } from "vitest";
 import {
+  CLAIM_SAFETY_COPY,
   emptyEpistemicSnapshot,
   emptyIntakeDraft,
   EvidenceVendor,
@@ -11,7 +12,7 @@ import {
 } from "@ceo-sandbox/domain";
 import { EntitySource } from "@ceo-sandbox/domain/server";
 import { createFixtureAdapter } from "./adapter";
-import { CrustdataAuthError } from "./errors";
+import { CrustdataAuthError, CrustdataTransportError } from "./errors";
 import { runCrustdataResearchPath } from "./run-path";
 import type { CrustdataAdapter } from "./types";
 
@@ -133,6 +134,158 @@ describe("runCrustdataResearchPath", () => {
     expect(snapshot.marketResearch?.crustdata.usedFallback).toBe(true);
     expect(snapshot.evidence).toHaveLength(1);
     expect(snapshot.evidence[0]?.vendor).toBe(EvidenceVendor.Fallback);
+  });
+
+  it("query build failure leaves failed status with no fallback evidence", async () => {
+    const intake = completeFullIntake();
+    intake.company = { ...intake.company!, category: "" };
+    const adapter: CrustdataAdapter = {
+      kind: "live",
+      identify: vi.fn(),
+      search: vi.fn(),
+      enrich: vi.fn(),
+    };
+    const { snapshot } = await runCrustdataResearchPath({
+      ...baseInput(emptyEpistemicSnapshot(), adapter),
+      intake,
+    });
+
+    expect(snapshot.marketResearch?.crustdata.status).toBe("failed");
+    expect(snapshot.marketResearch?.crustdata.httpCallCount).toBe(0);
+    expect(snapshot.marketResearch?.crustdata.usedFallback).toBe(false);
+    expect(snapshot.evidence).toHaveLength(0);
+    expect(adapter.search).not.toHaveBeenCalled();
+  });
+
+  it("refines with category search when first search returns no ids", async () => {
+    const refined: CrustdataCompany[] = [
+      {
+        crustdataCompanyId: "refined-1",
+        name: "Refined Co",
+        fieldPaths: ["basic_info.name"],
+        raw: {},
+      },
+    ];
+    const search = vi
+      .fn()
+      .mockResolvedValueOnce([])
+      .mockResolvedValueOnce(refined);
+    const adapter: CrustdataAdapter = {
+      kind: "live",
+      identify: vi.fn(async () => null),
+      search,
+      enrich: vi.fn(),
+    };
+    const { snapshot } = await runCrustdataResearchPath(
+      baseInput(emptyEpistemicSnapshot(), adapter),
+    );
+
+    expect(search).toHaveBeenCalledTimes(2);
+    expect(snapshot.evidence).toHaveLength(1);
+    expect(snapshot.marketResearch?.crustdata.status).toBe("ran");
+  });
+
+  it("stops enrich when deadline passes after search", async () => {
+    const companies: CrustdataCompany[] = Array.from({ length: 5 }, (_, i) => ({
+      crustdataCompanyId: `co-${i}`,
+      name: `Company ${i}`,
+      fieldPaths: ["basic_info.name"],
+      raw: {},
+    }));
+    let pastDeadline = false;
+    const enrich = vi.fn(async (id: string) => ({
+      crustdataCompanyId: id,
+      name: `Enriched ${id}`,
+      fieldPaths: ["basic_info.name"],
+      raw: {},
+    }));
+    const adapter: CrustdataAdapter = {
+      kind: "live",
+      identify: vi.fn(async () => null),
+      search: vi.fn(async () => {
+        pastDeadline = true;
+        return companies;
+      }),
+      enrich,
+    };
+    const intake = completeFullIntake();
+    intake.company = { ...intake.company!, domain: "acme.test" };
+    const { snapshot } = await runCrustdataResearchPath({
+      ...baseInput(emptyEpistemicSnapshot(), adapter),
+      intake,
+      enrichEnabled: true,
+      nowMs: () => (pastDeadline ? 2000 : 0),
+      deadlineMs: 1000,
+    });
+
+    expect(enrich).not.toHaveBeenCalled();
+    expect(snapshot.evidence).toHaveLength(5);
+    expect(snapshot.marketResearch?.crustdata.httpCallCount).toBe(2);
+  });
+
+  it("adds competitorNotDemand inference for demand-adjacent evidence", async () => {
+    const adapter: CrustdataAdapter = {
+      kind: "live",
+      identify: vi.fn(async () => null),
+      search: vi.fn(async () => [
+        {
+          crustdataCompanyId: "demand-1",
+          name: "Product Co",
+          fieldPaths: ["basic_info.description"],
+          raw: {},
+        },
+      ]),
+      enrich: vi.fn(),
+    };
+    const { snapshot } = await runCrustdataResearchPath(
+      baseInput(emptyEpistemicSnapshot(), adapter),
+    );
+
+    expect(snapshot.evidence[0]?.demandAdjacent).toBe(true);
+    expect(snapshot.inferences).toEqual([
+      {
+        statement: CLAIM_SAFETY_COPY.competitorNotDemand,
+        refIds: [snapshot.evidence[0]!.id],
+      },
+    ]);
+  });
+
+  it("transport failure uses fallback; programming errors propagate", async () => {
+    const fallbackCompanies: CrustdataCompany[] = [
+      {
+        crustdataCompanyId: "fb-1",
+        name: "Fallback Co",
+        fieldPaths: ["basic_info.name"],
+        raw: {},
+      },
+    ];
+    const transportAdapter: CrustdataAdapter = {
+      kind: "live",
+      identify: vi.fn(),
+      search: vi.fn(async () => {
+        throw new CrustdataTransportError("network down");
+      }),
+      enrich: vi.fn(),
+    };
+    const transportResult = await runCrustdataResearchPath({
+      ...baseInput(emptyEpistemicSnapshot(), transportAdapter),
+      fallbackCompanies,
+    });
+    expect(transportResult.snapshot.marketResearch?.crustdata.status).toBe(
+      "fallback",
+    );
+
+    const bugAdapter: CrustdataAdapter = {
+      kind: "live",
+      identify: vi.fn(),
+      search: vi.fn(async () => {
+        throw new Error("mapping_bug");
+      }),
+      enrich: vi.fn(),
+    };
+    await expect(
+      runCrustdataResearchPath(baseInput(emptyEpistemicSnapshot(), bugAdapter)),
+    ).rejects.toThrow("mapping_bug");
   });
 
   it("caps mapped companies at 5", async () => {

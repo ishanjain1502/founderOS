@@ -1,7 +1,7 @@
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import type { CrustdataCompany } from "@ceo-sandbox/domain";
-import { CrustdataAuthError } from "./errors";
+import { CrustdataAuthError, CrustdataTransportError } from "./errors";
 import { normalizeSearchRow } from "./normalize";
 import type { CrustdataAdapter } from "./types";
 
@@ -68,7 +68,9 @@ async function postWithRetries(
       }
 
       if (response.status >= 500) {
-        lastError = new Error(`Crustdata returned ${response.status}`);
+        lastError = new CrustdataTransportError(
+          `Crustdata returned ${response.status}`,
+        );
         if (attempt < MAX_RETRIES) {
           await sleep(RETRY_DELAYS_MS[attempt] ?? RETRY_DELAYS_MS.at(-1)!);
           continue;
@@ -81,16 +83,25 @@ async function postWithRetries(
       if (error instanceof CrustdataAuthError) {
         throw error;
       }
-      lastError = error;
+      lastError =
+        error instanceof CrustdataTransportError
+          ? error
+          : new CrustdataTransportError(
+              error instanceof Error ? error.message : "Crustdata request failed",
+              error instanceof Error ? { cause: error } : undefined,
+            );
       if (attempt < MAX_RETRIES) {
         await sleep(RETRY_DELAYS_MS[attempt] ?? RETRY_DELAYS_MS.at(-1)!);
         continue;
       }
-      throw error;
+      throw lastError;
     }
   }
 
-  throw lastError ?? new Error("Crustdata request failed");
+  throw (
+    lastError ??
+    new CrustdataTransportError("Crustdata request failed")
+  );
 }
 
 function parseSearchCompanies(payload: unknown): CrustdataCompany[] {

@@ -5,3 +5,11 @@ export class CrustdataAuthError extends Error {
     super(message);
   }
 }
+
+export class CrustdataTransportError extends Error {
+  override name = "CrustdataTransportError";
+
+  constructor(message = "Crustdata transport failed", options?: ErrorOptions) {
+    super(message, options);
+  }
+}

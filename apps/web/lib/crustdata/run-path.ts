@@ -19,7 +19,7 @@ import {
   EntitySource,
   newId,
 } from "@ceo-sandbox/domain/server";
-import { CrustdataAuthError } from "./errors";
+import { CrustdataAuthError, CrustdataTransportError } from "./errors";
 import type { CrustdataAdapter } from "./types";
 
 const MAX_COMPANIES = 5;
@@ -343,9 +343,12 @@ export async function runCrustdataResearchPath(
       successSourceMode,
     );
   } catch (error) {
-    const message =
-      error instanceof Error ? error.message : "crustdata_unrecoverable";
-    if (error instanceof CrustdataAuthError || error instanceof Error) {
+    if (
+      error instanceof CrustdataAuthError ||
+      error instanceof CrustdataTransportError
+    ) {
+      const message =
+        error instanceof Error ? error.message : "crustdata_unrecoverable";
       applyFallback(
         out,
         query,

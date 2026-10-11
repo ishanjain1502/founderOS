@@ -1,6 +1,6 @@
 import { join } from "node:path";
 import { describe, expect, it, vi } from "vitest";
-import { CrustdataAuthError } from "./errors";
+import { CrustdataAuthError, CrustdataTransportError } from "./errors";
 import { createFixtureAdapter, createLiveAdapter } from "./adapter";
 
 const fixtureRoot = join(process.cwd(), "../../fixtures/crustdata");
@@ -59,6 +59,22 @@ describe("createLiveAdapter", () => {
 
     expect(fetchFn).toHaveBeenCalledTimes(2);
     expect(sleep).toHaveBeenCalledTimes(1);
+  });
+
+  it("throws CrustdataTransportError when 500 persists after retries", async () => {
+    const fetchFn = vi.fn(async () => new Response("error", { status: 500 }));
+    const sleep = vi.fn(async () => {});
+
+    const adapter = createLiveAdapter({
+      apiKey: "test-key",
+      fetchFn,
+      sleep,
+    });
+
+    await expect(adapter.search("q")).rejects.toBeInstanceOf(
+      CrustdataTransportError,
+    );
+    expect(fetchFn).toHaveBeenCalledTimes(3);
   });
 
   it("throws CrustdataAuthError on 401 without retry", async () => {
