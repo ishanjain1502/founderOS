@@ -41,12 +41,17 @@ function ownerFromRationaleTag(
 
 function budgetOwnerFromFieldSource(
   source: FieldSource | undefined,
-): ClaimOwner {
-  if (
-    source === FieldSource.DemoFixture ||
-    source === FieldSource.User ||
-    source === FieldSource.SystemDefault
-  ) {
+): ClaimOwner | null {
+  if (source === FieldSource.ProvideLater) {
+    return null;
+  }
+  if (source === FieldSource.DemoFixture) {
+    return ClaimOwner.DemoFixture;
+  }
+  if (source === FieldSource.User) {
+    return ClaimOwner.User;
+  }
+  if (source === FieldSource.SystemDefault) {
     return ClaimOwner.System;
   }
   return ClaimOwner.User;
@@ -111,22 +116,24 @@ export function projectIntakeToEpistemic(
     const owner = budgetOwnerFromFieldSource(
       fieldSources["constraints.budgetUsd"],
     );
-    snap.claims.push({
-      ...baseClaimFields(ctx, newId()),
-      kind: ClaimKind.Assumption,
-      statement: `Budget cap is ${budgetUsd} USD (one-time).`,
-      numeric: {
-        unit: "money",
-        value: budgetUsd,
-        currency: "USD",
-        period: "one_time",
-      } satisfies AssumptionNumeric,
-      mapsTo: "budget",
-      rationaleTag: ClaimRationaleTag.SystemDefault,
-      status: ClaimStatus.Active,
-      owner,
-      locked: owner === ClaimOwner.DemoFixture,
-    });
+    if (owner !== null) {
+      snap.claims.push({
+        ...baseClaimFields(ctx, newId()),
+        kind: ClaimKind.Assumption,
+        statement: `Budget cap is ${budgetUsd} USD (one-time).`,
+        numeric: {
+          unit: "money",
+          value: budgetUsd,
+          currency: "USD",
+          period: "one_time",
+        } satisfies AssumptionNumeric,
+        mapsTo: "budget",
+        rationaleTag: ClaimRationaleTag.SystemDefault,
+        status: ClaimStatus.Active,
+        owner,
+        locked: owner === ClaimOwner.DemoFixture,
+      });
+    }
   }
 
   const executionMonths = intake.constraints?.executionMonths;

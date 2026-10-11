@@ -3,7 +3,8 @@ import { CLAIM_SAFETY_COPY } from "./epistemic";
 import { findForbiddenPhrases } from "./forbidden-phrases";
 import { RunMode } from "./run-mode";
 import { ClaimKind } from "./contracts/enums";
-import { emptyIntakeDraft } from "./contracts/intake";
+import { ClaimOwner } from "./contracts/claim";
+import { emptyIntakeDraft, FieldSource } from "./contracts/intake";
 import {
   DEMO_HYPOTHESIS_STATEMENT,
   DEMO_OBSERVED_SUMMARY,
@@ -83,6 +84,24 @@ describe("projectIntakeToEpistemic", () => {
     ]);
     expect(findForbiddenPhrases(ev.summary)).toEqual([]);
     expect(findForbiddenPhrases(DEMO_HYPOTHESIS_STATEMENT)).toEqual([]);
+  });
+
+  it("maps user budget fieldSource to claim owner user", () => {
+    const intake = completeIntake(RunMode.Full);
+    intake.fieldSources = {
+      ...intake.fieldSources,
+      "constraints.budgetUsd": FieldSource.User,
+    };
+    const snap = projectIntakeToEpistemic(intake, {
+      mode: RunMode.Full,
+      sessionId: SESSION,
+      now: NOW,
+    });
+    const budget = snap.claims.find(
+      (c) => c.kind === ClaimKind.Assumption && c.mapsTo === "budget",
+    );
+    expect(budget).toBeDefined();
+    expect(budget!.owner).toBe(ClaimOwner.User);
   });
 
   it("does not emit WTP Unknown when proposedPriceUsd is set", () => {
