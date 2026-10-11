@@ -29,6 +29,8 @@ export {
   FeatureChangeType,
 } from "./contracts/enums";
 
+export { EvidenceVendor } from "./contracts/evidence";
+
 export {
   LAST_SESSION_COOKIE,
   SHORT_TEXT_MAX,

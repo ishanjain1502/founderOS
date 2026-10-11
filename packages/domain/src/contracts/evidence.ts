@@ -1,11 +1,23 @@
 import { z } from "zod";
 import { baseEntitySchema } from "./base";
 
+export enum EvidenceVendor {
+  Crustdata = "crustdata",
+  Fallback = "fallback",
+  DemoFixture = "demo_fixture",
+}
+
+export const evidenceVendorSchema = z.nativeEnum(EvidenceVendor);
+
 function hasExternalIdentity(data: {
   externalId?: string;
   canonicalUrl?: string;
   identityKey?: string;
+  quarantine?: boolean;
 }): boolean {
+  if (data.quarantine === true) {
+    return true;
+  }
   if (data.externalId && data.externalId.length > 0) {
     return true;
   }
@@ -27,6 +39,10 @@ export const evidenceSchema = baseEntitySchema
     canonicalUrl: z.string().url().optional(),
     /** Stable key when no provider id or URL (e.g. `fallback:crustdata:{runId}`). */
     identityKey: z.string().min(1).optional(),
+    vendor: evidenceVendorSchema,
+    fieldPaths: z.array(z.string().min(1)).optional(),
+    demandAdjacent: z.boolean().optional(),
+    quarantine: z.boolean().optional(),
     retrievedAt: z.string().datetime(),
     sourceTimeUnknown: z.boolean().optional(),
     vendorTimestamp: z.string().optional(),
