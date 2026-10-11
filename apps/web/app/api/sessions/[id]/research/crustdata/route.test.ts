@@ -83,4 +83,42 @@ describe("POST /api/sessions/:id/research/crustdata", () => {
     const secondBody = await second.json();
     expect(secondBody.epistemic.evidence.length).toBe(evidenceLen);
   });
+
+  it("CRUSTDATA_LIVE=1 without key uses fallback vendor not recorded crustdata", async () => {
+    const dir = mkdtempSync(join(tmpdir(), "ceo-web-"));
+    dirs.push(dir);
+    process.env.SANDBOX_SQLITE_PATH = join(dir, "sandbox.sqlite");
+    process.env.CRUSTDATA_LIVE = "1";
+    delete process.env.CRUSTDATA_API_KEY;
+
+    const { POST: create } = await import("../../../route");
+    const createdRes = await create(
+      new Request("http://localhost/api/sessions", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ mode: RunMode.Full }),
+      }),
+    );
+    const created = await createdRes.json();
+
+    const store = getStore();
+    store.updateIntake(created.id, completeFullIntake());
+    store.approveSession(created.id);
+    store.startSession(created.id);
+
+    const { POST: research } = await import("./route");
+    const res = await research(
+      new Request("http://localhost", { method: "POST" }),
+      { params: Promise.resolve({ id: created.id }) },
+    );
+    expect(res.status).toBe(200);
+    const body = await res.json();
+    expect(body.epistemic.marketResearch.crustdata.status).toBe("fallback");
+    expect(body.epistemic.marketResearch.crustdata.sourceMode).toBe("fallback");
+    expect(
+      body.epistemic.evidence.every(
+        (e: { vendor: string }) => e.vendor !== "crustdata",
+      ),
+    ).toBe(true);
+  });
 });

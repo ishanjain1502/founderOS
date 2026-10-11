@@ -12,7 +12,12 @@ import {
 } from "@ceo-sandbox/domain";
 import { EntitySource } from "@ceo-sandbox/domain/server";
 import { createFixtureAdapter } from "./adapter";
-import { CrustdataAuthError, CrustdataTransportError } from "./errors";
+import {
+  CrustdataAuthError,
+  CrustdataClientError,
+  CrustdataTransportError,
+} from "./errors";
+import { ClaimKind, ClaimOwner, ClaimRationaleTag } from "@ceo-sandbox/domain/server";
 import { runCrustdataResearchPath } from "./run-path";
 import type { CrustdataAdapter } from "./types";
 
@@ -111,6 +116,7 @@ describe("runCrustdataResearchPath", () => {
     const adapter: CrustdataAdapter = {
       kind: "live",
       identify: vi.fn(),
+      identifyByName: vi.fn(),
       search: vi.fn(async () => {
         throw new CrustdataAuthError();
       }),
@@ -142,6 +148,7 @@ describe("runCrustdataResearchPath", () => {
     const adapter: CrustdataAdapter = {
       kind: "live",
       identify: vi.fn(),
+      identifyByName: vi.fn(),
       search: vi.fn(),
       enrich: vi.fn(),
     };
@@ -173,6 +180,7 @@ describe("runCrustdataResearchPath", () => {
     const adapter: CrustdataAdapter = {
       kind: "live",
       identify: vi.fn(async () => null),
+      identifyByName: vi.fn(async () => null),
       search,
       enrich: vi.fn(),
     };
@@ -202,6 +210,7 @@ describe("runCrustdataResearchPath", () => {
     const adapter: CrustdataAdapter = {
       kind: "live",
       identify: vi.fn(async () => null),
+      identifyByName: vi.fn(async () => null),
       search: vi.fn(async () => {
         pastDeadline = true;
         return companies;
@@ -227,6 +236,7 @@ describe("runCrustdataResearchPath", () => {
     const adapter: CrustdataAdapter = {
       kind: "live",
       identify: vi.fn(async () => null),
+      identifyByName: vi.fn(async () => null),
       search: vi.fn(async () => [
         {
           crustdataCompanyId: "demand-1",
@@ -262,6 +272,7 @@ describe("runCrustdataResearchPath", () => {
     const transportAdapter: CrustdataAdapter = {
       kind: "live",
       identify: vi.fn(),
+      identifyByName: vi.fn(),
       search: vi.fn(async () => {
         throw new CrustdataTransportError("network down");
       }),
@@ -278,6 +289,7 @@ describe("runCrustdataResearchPath", () => {
     const bugAdapter: CrustdataAdapter = {
       kind: "live",
       identify: vi.fn(),
+      identifyByName: vi.fn(),
       search: vi.fn(async () => {
         throw new Error("mapping_bug");
       }),
@@ -298,6 +310,7 @@ describe("runCrustdataResearchPath", () => {
     const adapter: CrustdataAdapter = {
       kind: "live",
       identify: vi.fn(async () => null),
+      identifyByName: vi.fn(async () => null),
       search: vi.fn(async () => many),
       enrich: vi.fn(),
     };
@@ -305,5 +318,133 @@ describe("runCrustdataResearchPath", () => {
       baseInput(emptyEpistemicSnapshot(), adapter),
     );
     expect(snapshot.evidence).toHaveLength(5);
+  });
+
+  it("domain mismatch does not map unrelated identify company", async () => {
+    const identify = vi.fn(async () => null);
+    const search = vi.fn(async () => [
+      {
+        crustdataCompanyId: "search-1",
+        name: "Search Co",
+        fieldPaths: ["basic_info.name"],
+        raw: {},
+      },
+    ]);
+    const adapter: CrustdataAdapter = {
+      kind: "live",
+      identify,
+      identifyByName: vi.fn(async () => null),
+      search,
+      enrich: vi.fn(),
+    };
+    const intake = completeFullIntake();
+    intake.company = { ...intake.company!, domain: "acme.test" };
+
+    const { snapshot } = await runCrustdataResearchPath({
+      ...baseInput(emptyEpistemicSnapshot(), adapter),
+      intake,
+    });
+
+    expect(identify).toHaveBeenCalledWith("acme.test");
+    expect(snapshot.evidence).toHaveLength(1);
+    expect(snapshot.evidence[0]?.externalId).toBe("search-1");
+    expect(
+      snapshot.claims.some((c) =>
+        c.statement.includes("did not confirm company domain acme.test"),
+      ),
+    ).toBe(true);
+  });
+
+  it("keeps domain identify match id in mapped companies", async () => {
+    const identify = vi.fn(async () => ({
+      companyId: "identified-1",
+      primaryDomain: "acme.test",
+    }));
+    const search = vi.fn(async () => [
+      {
+        crustdataCompanyId: "search-1",
+        name: "Search Co",
+        fieldPaths: ["basic_info.name"],
+        raw: {},
+      },
+    ]);
+    const adapter: CrustdataAdapter = {
+      kind: "live",
+      identify,
+      identifyByName: vi.fn(async () => null),
+      search,
+      enrich: vi.fn(),
+    };
+    const intake = completeFullIntake();
+    intake.company = { ...intake.company!, domain: "acme.test" };
+
+    const { snapshot } = await runCrustdataResearchPath({
+      ...baseInput(emptyEpistemicSnapshot(), adapter),
+      intake,
+    });
+
+    const ids = snapshot.evidence.map((e) => e.externalId);
+    expect(ids).toContain("identified-1");
+    expect(ids).toContain("search-1");
+  });
+
+  it("failed competitor identify adds user assumption not evidence", async () => {
+    const identifyByName = vi.fn(async () => null);
+    const adapter: CrustdataAdapter = {
+      kind: "live",
+      identify: vi.fn(async () => null),
+      identifyByName,
+      search: vi.fn(async () => []),
+      enrich: vi.fn(),
+    };
+    const intake = completeFullIntake();
+    intake.company = {
+      ...intake.company!,
+      competitors: ["Unknown Competitor Inc"],
+    };
+
+    const { snapshot } = await runCrustdataResearchPath({
+      ...baseInput(emptyEpistemicSnapshot(), adapter),
+      intake,
+    });
+
+    expect(identifyByName).toHaveBeenCalledWith("Unknown Competitor Inc");
+    const assumption = snapshot.claims.find(
+      (c) => c.kind === ClaimKind.Assumption,
+    );
+    expect(assumption).toMatchObject({
+      owner: ClaimOwner.User,
+      rationaleTag: ClaimRationaleTag.UserProvided,
+      statement: "User-named competitor Unknown Competitor Inc not found in Crustdata.",
+    });
+    expect(snapshot.evidence).toHaveLength(0);
+  });
+
+  it("live 400 maps to failed with no fallback evidence", async () => {
+    const adapter: CrustdataAdapter = {
+      kind: "live",
+      identify: vi.fn(),
+      identifyByName: vi.fn(),
+      search: vi.fn(async () => {
+        throw new CrustdataClientError("Crustdata returned 400");
+      }),
+      enrich: vi.fn(),
+    };
+    const fallbackCompanies: CrustdataCompany[] = [
+      {
+        crustdataCompanyId: "fb-1",
+        name: "Fallback Co",
+        fieldPaths: ["basic_info.name"],
+        raw: {},
+      },
+    ];
+    const { snapshot } = await runCrustdataResearchPath({
+      ...baseInput(emptyEpistemicSnapshot(), adapter),
+      fallbackCompanies,
+    });
+
+    expect(snapshot.marketResearch?.crustdata.status).toBe("failed");
+    expect(snapshot.marketResearch?.crustdata.usedFallback).toBe(false);
+    expect(snapshot.evidence).toHaveLength(0);
   });
 });

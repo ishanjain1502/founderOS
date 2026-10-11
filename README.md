@@ -38,7 +38,7 @@ Optional (server-side only; Crustdata market research — **never commit key val
 | Variable | Purpose |
 |----------|---------|
 | `CRUSTDATA_API_KEY` | Bearer token for Crustdata REST (`authorization: Bearer …`); server routes only |
-| `CRUSTDATA_LIVE` | Set to `1` to call Crustdata REST when a key is present; otherwise fixtures / recorded responses |
+| `CRUSTDATA_LIVE` | Set to `1` together with `CRUSTDATA_API_KEY` to use live Crustdata REST; otherwise fixtures / recorded responses |
 
 ## Development
 

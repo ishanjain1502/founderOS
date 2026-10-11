@@ -34,7 +34,6 @@ function canRetrieve(
 }
 
 function buttonLabel(
-  sessionStatus: string,
   crustdataStatus: CrustdataResearchState["status"] | undefined,
 ): string {
   const status = crustdataStatus ?? "idle";
@@ -58,7 +57,7 @@ export function CrustdataResearch({
   const [queryOpen, setQueryOpen] = useState(false);
 
   const enabled = canRetrieve(sessionStatus, crustdataStatus) && !busy;
-  const label = buttonLabel(sessionStatus, crustdataStatus);
+  const label = buttonLabel(crustdataStatus);
 
   async function handleRetrieve() {
     if (!enabled) return;

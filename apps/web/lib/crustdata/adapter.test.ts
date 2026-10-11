@@ -1,7 +1,8 @@
 import { join } from "node:path";
 import { describe, expect, it, vi } from "vitest";
-import { CrustdataAuthError, CrustdataTransportError } from "./errors";
-import { createFixtureAdapter, createLiveAdapter } from "./adapter";
+import { CrustdataAuthError, CrustdataClientError, CrustdataTransportError } from "./errors";
+import { createFixtureAdapter } from "./adapter";
+import { createLiveAdapterForTests } from "./select-adapter";
 
 const fixtureRoot = join(process.cwd(), "../../fixtures/crustdata");
 
@@ -30,7 +31,7 @@ describe("createLiveAdapter", () => {
       return new Response(JSON.stringify({ companies: [] }), { status: 200 });
     });
 
-    const adapter = createLiveAdapter({ apiKey: "test-key", fetchFn });
+    const adapter = createLiveAdapterForTests({ apiKey: "test-key", fetchFn });
     await adapter.search("analytics");
 
     expect(calls).toHaveLength(1);
@@ -50,7 +51,7 @@ describe("createLiveAdapter", () => {
     });
     const sleep = vi.fn(async () => {});
 
-    const adapter = createLiveAdapter({
+    const adapter = createLiveAdapterForTests({
       apiKey: "test-key",
       fetchFn,
       sleep,
@@ -65,7 +66,7 @@ describe("createLiveAdapter", () => {
     const fetchFn = vi.fn(async () => new Response("error", { status: 500 }));
     const sleep = vi.fn(async () => {});
 
-    const adapter = createLiveAdapter({
+    const adapter = createLiveAdapterForTests({
       apiKey: "test-key",
       fetchFn,
       sleep,
@@ -81,7 +82,7 @@ describe("createLiveAdapter", () => {
     const fetchFn = vi.fn(async () => new Response("unauthorized", { status: 401 }));
     const sleep = vi.fn(async () => {});
 
-    const adapter = createLiveAdapter({
+    const adapter = createLiveAdapterForTests({
       apiKey: "bad-key",
       fetchFn,
       sleep,
@@ -101,7 +102,7 @@ describe("createLiveAdapter", () => {
         { status: 200 },
       ),
     );
-    const adapter = createLiveAdapter({ apiKey: "test-key", fetchFn });
+    const adapter = createLiveAdapterForTests({ apiKey: "test-key", fetchFn });
     await expect(adapter.identify("example.com")).resolves.toBeNull();
   });
 
@@ -114,7 +115,7 @@ describe("createLiveAdapter", () => {
         { status: 200 },
       ),
     );
-    const adapter = createLiveAdapter({ apiKey: "test-key", fetchFn });
+    const adapter = createLiveAdapterForTests({ apiKey: "test-key", fetchFn });
     await expect(adapter.identify("www.example.com")).resolves.toEqual({
       companyId: "co-1",
       primaryDomain: "example.com",
@@ -130,7 +131,7 @@ describe("createLiveAdapter", () => {
         { status: 200 },
       ),
     );
-    const adapter = createLiveAdapter({ apiKey: "test-key", fetchFn });
+    const adapter = createLiveAdapterForTests({ apiKey: "test-key", fetchFn });
     await expect(adapter.identify("example.com")).resolves.toEqual({
       companyId: "co-2",
       primaryDomain: "www.example.com",
@@ -146,7 +147,59 @@ describe("createLiveAdapter", () => {
         { status: 200 },
       ),
     );
-    const adapter = createLiveAdapter({ apiKey: "test-key", fetchFn });
+    const adapter = createLiveAdapterForTests({ apiKey: "test-key", fetchFn });
     await expect(adapter.identify("example.com")).resolves.toBeNull();
+  });
+
+  it("throws CrustdataClientError on 400 without retry", async () => {
+    const fetchFn = vi.fn(async () => new Response("bad request", { status: 400 }));
+    const sleep = vi.fn(async () => {});
+
+    const adapter = createLiveAdapterForTests({
+      apiKey: "test-key",
+      fetchFn,
+      sleep,
+    });
+
+    await expect(adapter.search("q")).rejects.toBeInstanceOf(CrustdataClientError);
+    expect(fetchFn).toHaveBeenCalledTimes(1);
+    expect(sleep).not.toHaveBeenCalled();
+  });
+
+  it("429 waits once then throws transport error if still blocked", async () => {
+    const fetchFn = vi.fn(async () => new Response("rate limited", { status: 429 }));
+    const sleep = vi.fn(async () => {});
+
+    const adapter = createLiveAdapterForTests({
+      apiKey: "test-key",
+      fetchFn,
+      sleep,
+    });
+
+    await expect(adapter.search("q")).rejects.toBeInstanceOf(CrustdataTransportError);
+    expect(fetchFn).toHaveBeenCalledTimes(2);
+    expect(sleep).toHaveBeenCalledWith(1000);
+  });
+
+  it("uses in-memory cache for identical POST bodies in production adapter", async () => {
+    let n = 0;
+    const fetchFn = vi.fn(async () => {
+      n += 1;
+      return new Response(JSON.stringify({ companies: [] }), { status: 200 });
+    });
+
+    const { createLiveAdapter } = await import("./adapter");
+    const { createInMemoryCrustdataCache } = await import("./cache");
+    const cache = createInMemoryCrustdataCache(() => 0);
+    const adapter = createLiveAdapter({
+      apiKey: "test-key",
+      fetchFn,
+      cache,
+    });
+
+    await adapter.search("same-query");
+    await adapter.search("same-query");
+
+    expect(fetchFn).toHaveBeenCalledTimes(1);
   });
 });

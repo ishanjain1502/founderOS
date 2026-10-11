@@ -19,7 +19,11 @@ import {
   EntitySource,
   newId,
 } from "@ceo-sandbox/domain/server";
-import { CrustdataAuthError, CrustdataTransportError } from "./errors";
+import {
+  CrustdataAuthError,
+  CrustdataClientError,
+  CrustdataTransportError,
+} from "./errors";
 import type { CrustdataAdapter } from "./types";
 
 const MAX_COMPANIES = 5;
@@ -82,6 +86,32 @@ function baseClaimFields(sessionId: string, now: string, id: string) {
     createdAt: now,
     source: EntitySource.System,
     sessionId,
+  };
+}
+
+function competitorAssumptionStatement(name: string): string {
+  return `User-named competitor ${name} not found in Crustdata.`;
+}
+
+function domainIdentifyGapStatement(domain: string): string {
+  return `Crustdata identify did not confirm company domain ${domain}.`;
+}
+
+function applyFailed(
+  out: EpistemicSnapshot,
+  query: string,
+  httpCallCount: number,
+  error: string,
+): void {
+  out.marketResearch = {
+    crustdata: {
+      status: "failed",
+      query,
+      httpCallCount,
+      usedFallback: false,
+      sourceMode: "none",
+      error: truncateError(error),
+    },
   };
 }
 
@@ -178,6 +208,27 @@ function appendMappedCompanies(
   return summaries;
 }
 
+function appendSingleMappedCompany(
+  out: EpistemicSnapshot,
+  company: CrustdataCompany,
+  sessionId: string,
+  now: string,
+  vendor: EvidenceVendor.Crustdata,
+  sourceMode: "live" | "recorded",
+  writeRaw: (ref: string, raw: unknown) => void,
+): string {
+  const [summary] = appendMappedCompanies(
+    out,
+    [company],
+    sessionId,
+    now,
+    vendor,
+    sourceMode,
+    writeRaw,
+  );
+  return summary ?? "";
+}
+
 function maybeAppendAnalyticsHypothesis(
   out: EpistemicSnapshot,
   crustdataSummaries: string[],
@@ -223,12 +274,61 @@ function maybeAppendEmptySearchUnknown(
   });
 }
 
+function appendDomainIdentifyGap(
+  out: EpistemicSnapshot,
+  domain: string,
+  sessionId: string,
+  now: string,
+): void {
+  const statement = domainIdentifyGapStatement(domain);
+  if (out.claims.some((c) => c.statement === statement)) {
+    return;
+  }
+  out.claims.push({
+    ...baseClaimFields(sessionId, now, newId()),
+    kind: ClaimKind.Unknown,
+    statement,
+    rationaleTag: ClaimRationaleTag.MissingEvidence,
+    owner: ClaimOwner.System,
+    status: ClaimStatus.Active,
+  });
+}
+
+function appendCompetitorAssumption(
+  out: EpistemicSnapshot,
+  name: string,
+  sessionId: string,
+  now: string,
+): void {
+  const statement = competitorAssumptionStatement(name);
+  if (out.claims.some((c) => c.statement === statement)) {
+    return;
+  }
+  out.claims.push({
+    ...baseClaimFields(sessionId, now, newId()),
+    kind: ClaimKind.Assumption,
+    statement,
+    rationaleTag: ClaimRationaleTag.UserProvided,
+    owner: ClaimOwner.User,
+    status: ClaimStatus.Active,
+  });
+}
+
 function canIssueCall(
   logicalCalls: number,
   nowMs: () => number,
   deadlineMs: number,
 ): boolean {
   return logicalCalls < MAX_LOGICAL_CALLS && nowMs() <= deadlineMs;
+}
+
+function placeholderCompany(id: string, label: string): CrustdataCompany {
+  return {
+    crustdataCompanyId: id,
+    name: label,
+    fieldPaths: [],
+    raw: { crustdataCompanyId: id },
+  };
 }
 
 export async function runCrustdataResearchPath(
@@ -252,28 +352,30 @@ export async function runCrustdataResearchPath(
   });
 
   if (!queryResult.ok) {
-    out.marketResearch = {
-      crustdata: {
-        status: "failed",
-        query: "",
-        httpCallCount: 0,
-        usedFallback: false,
-        sourceMode: "none",
-        error: truncateError(queryResult.error),
-      },
-    };
+    applyFailed(out, "", 0, queryResult.error);
     assertValidSnapshot(out);
     return { snapshot: out };
   }
 
   const query = queryResult.query;
   let logicalCalls = 0;
+  const orderedIds: string[] = [];
+  const companyById = new Map<string, CrustdataCompany>();
 
   try {
     const domain = input.intake.company?.domain?.trim();
     if (domain && canIssueCall(logicalCalls, input.nowMs, input.deadlineMs)) {
       logicalCalls += 1;
-      await input.adapter.identify(domain);
+      const match = await input.adapter.identify(domain);
+      if (match) {
+        orderedIds.push(match.companyId);
+        companyById.set(
+          match.companyId,
+          placeholderCompany(match.companyId, domain),
+        );
+      } else {
+        appendDomainIdentifyGap(out, domain, input.sessionId, input.now);
+      }
     }
 
     let companies: CrustdataCompany[] = [];
@@ -295,11 +397,24 @@ export async function runCrustdataResearchPath(
       }
     }
 
-    companies = withIds.slice(0, MAX_COMPANIES);
+    for (const company of withIds) {
+      if (orderedIds.length >= MAX_COMPANIES) {
+        break;
+      }
+      if (!companyById.has(company.crustdataCompanyId)) {
+        orderedIds.push(company.crustdataCompanyId);
+        companyById.set(company.crustdataCompanyId, company);
+      }
+    }
+
+    const toEnrich = orderedIds
+      .slice(0, MAX_COMPANIES)
+      .map((id) => companyById.get(id)!)
+      .filter(Boolean);
 
     const enriched: CrustdataCompany[] = [];
     if (input.enrichEnabled) {
-      for (const company of companies) {
+      for (const company of toEnrich) {
         if (!canIssueCall(logicalCalls, input.nowMs, input.deadlineMs)) {
           enriched.push(company);
           continue;
@@ -309,7 +424,7 @@ export async function runCrustdataResearchPath(
         enriched.push(row ?? company);
       }
     } else {
-      enriched.push(...companies);
+      enriched.push(...toEnrich);
     }
 
     const successSourceMode =
@@ -323,11 +438,62 @@ export async function runCrustdataResearchPath(
       successSourceMode,
       input.writeRaw,
     );
+
+    let mappedCount = enriched.length;
+    const mappedIdSet = new Set(
+      enriched.map((c) => c.crustdataCompanyId).filter(Boolean),
+    );
+
+    const competitors = input.intake.company?.competitors ?? [];
+    for (const rawName of competitors) {
+      const name = rawName.trim();
+      if (!name) {
+        continue;
+      }
+      if (
+        !canIssueCall(logicalCalls, input.nowMs, input.deadlineMs) ||
+        mappedCount >= MAX_COMPANIES
+      ) {
+        break;
+      }
+      logicalCalls += 1;
+      const match = await input.adapter.identifyByName(name);
+      if (!match) {
+        appendCompetitorAssumption(out, name, input.sessionId, input.now);
+        continue;
+      }
+      if (mappedIdSet.has(match.companyId)) {
+        continue;
+      }
+      let company = placeholderCompany(match.companyId, name);
+      if (
+        input.enrichEnabled &&
+        canIssueCall(logicalCalls, input.nowMs, input.deadlineMs)
+      ) {
+        logicalCalls += 1;
+        company =
+          (await input.adapter.enrich(match.companyId)) ?? company;
+      }
+      summaries.push(
+        appendSingleMappedCompany(
+          out,
+          company,
+          input.sessionId,
+          input.now,
+          EvidenceVendor.Crustdata,
+          successSourceMode,
+          input.writeRaw,
+        ),
+      );
+      mappedIdSet.add(match.companyId);
+      mappedCount += 1;
+    }
+
     maybeAppendEmptySearchUnknown(
       out,
       input.sessionId,
       input.now,
-      enriched.length,
+      mappedCount,
     );
     maybeAppendAnalyticsHypothesis(
       out,
@@ -343,7 +509,11 @@ export async function runCrustdataResearchPath(
       successSourceMode,
     );
   } catch (error) {
-    if (
+    if (error instanceof CrustdataClientError) {
+      const message =
+        error instanceof Error ? error.message : "crustdata_client_error";
+      applyFailed(out, query, logicalCalls, message);
+    } else if (
       error instanceof CrustdataAuthError ||
       error instanceof CrustdataTransportError
     ) {
