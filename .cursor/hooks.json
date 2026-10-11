@@ -1,40 +1,40 @@
 {
+  "version": 1,
   "hooks": {
     "beforeSubmitPrompt": [
       {
-        "command": "sh -c 'if ! command -v entire >/dev/null 2>&1; then exit 0; fi; exec entire hooks cursor before-submit-prompt'"
+        "command": ".cursor/hooks/entire-cursor.sh before-submit-prompt"
       }
     ],
     "preCompact": [
       {
-        "command": "sh -c 'if ! command -v entire >/dev/null 2>&1; then exit 0; fi; exec entire hooks cursor pre-compact'"
+        "command": ".cursor/hooks/entire-cursor.sh pre-compact"
       }
     ],
     "sessionEnd": [
       {
-        "command": "sh -c 'if ! command -v entire >/dev/null 2>&1; then exit 0; fi; exec entire hooks cursor session-end'"
+        "command": ".cursor/hooks/entire-cursor.sh session-end"
       }
     ],
     "sessionStart": [
       {
-        "command": "sh -c 'if ! command -v entire >/dev/null 2>&1; then exit 0; fi; exec entire hooks cursor session-start'"
+        "command": ".cursor/hooks/entire-cursor.sh session-start"
       }
     ],
     "stop": [
       {
-        "command": "sh -c 'if ! command -v entire >/dev/null 2>&1; then exit 0; fi; exec entire hooks cursor stop'"
+        "command": ".cursor/hooks/entire-cursor.sh stop"
       }
     ],
     "subagentStart": [
       {
-        "command": "sh -c 'if ! command -v entire >/dev/null 2>&1; then exit 0; fi; exec entire hooks cursor subagent-start'"
+        "command": ".cursor/hooks/entire-cursor.sh subagent-start"
       }
     ],
     "subagentStop": [
       {
-        "command": "sh -c 'if ! command -v entire >/dev/null 2>&1; then exit 0; fi; exec entire hooks cursor subagent-stop'"
+        "command": ".cursor/hooks/entire-cursor.sh subagent-stop"
       }
     ]
-  },
-  "version": 1
+  }
 }
