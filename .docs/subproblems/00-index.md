@@ -22,6 +22,7 @@ This folder decomposes that spec into subproblems that **must** be solved before
 | SP-02 | `.docs/specs/SP-02-shared-domain-contracts.md` | `docs/superpowers/plans/2026-10-11-sp02-domain-contracts.md` |
 | SP-03 | `.docs/specs/SP-03-decision-intake-and-company-context.md` | `docs/superpowers/plans/2026-10-11-sp03-intake-and-company-context.md` |
 | SP-04 | `.docs/specs/SP-04-evidence-assumptions-uncertainty.md` | `docs/superpowers/plans/2026-10-12-sp04-evidence-assumptions-uncertainty.md` |
+| SP-05 | `.docs/specs/SP-05-crustdata-market-research.md` | `docs/superpowers/plans/2026-10-12-sp05-crustdata-market-research.md` |
 
 Subproblem question docs remain the Q&A source of truth; specs consolidate locked answers for builders.
 

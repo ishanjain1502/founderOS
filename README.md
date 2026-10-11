@@ -12,6 +12,8 @@ Autonomous CEO Decision Sandbox monorepo.
 - [SP-03 implementation plan](docs/superpowers/plans/2026-10-11-sp03-intake-and-company-context.md)
 - [SP-04 evidence, assumptions, and uncertainty (spec)](.docs/specs/SP-04-evidence-assumptions-uncertainty.md)
 - [SP-04 implementation plan](docs/superpowers/plans/2026-10-12-sp04-evidence-assumptions-uncertainty.md)
+- [SP-05 Crustdata market research (spec)](.docs/specs/SP-05-crustdata-market-research.md)
+- [SP-05 implementation plan](docs/superpowers/plans/2026-10-12-sp05-crustdata-market-research.md)
 - [Subproblem index](.docs/subproblems/00-index.md)
 - [Project initialization](.docs/init.md)
 
@@ -30,6 +32,13 @@ Optional (server-side only; used for intake scope-check when configured):
 | `ANTHROPIC_API_KEY` | Required when `LLM_PROVIDER=anthropic` |
 
 If LLM env vars are missing, scope-check returns “LLM not configured” without calling the network.
+
+Optional (server-side only; Crustdata market research — **never commit key values**):
+
+| Variable | Purpose |
+|----------|---------|
+| `CRUSTDATA_API_KEY` | Bearer token for Crustdata REST (`authorization: Bearer …`); server routes only |
+| `CRUSTDATA_LIVE` | Set to `1` to call Crustdata REST when a key is present; otherwise fixtures / recorded responses |
 
 ## Development
 
