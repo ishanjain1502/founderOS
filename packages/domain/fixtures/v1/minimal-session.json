@@ -64,6 +64,9 @@
       "kind": "assumption",
       "statement": "Pilot adoption reaches 18% of existing customers in year one.",
       "numeric": { "unit": "percent", "value": 18 },
+      "owner": "demo_fixture",
+      "status": "active",
+      "mapsTo": "adoption_rate",
       "rationaleTag": "demo_fixture"
     }
   ],

@@ -32,6 +32,14 @@ export {
 export { EvidenceVendor } from "./contracts/evidence";
 
 export {
+  ClaimOwner,
+  ClaimStatus,
+  mayAgentMutate,
+  claimsConflict,
+  contradictionPredicate,
+} from "./contracts/claim";
+
+export {
   LAST_SESSION_COOKIE,
   SHORT_TEXT_MAX,
   QUESTION_MAX,

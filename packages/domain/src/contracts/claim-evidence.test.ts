@@ -1,6 +1,14 @@
 import { describe, it, expect } from "vitest";
 import { ClaimKind } from "./enums";
-import { assumptionNumericSchema, claimSchema } from "./claim";
+import {
+  assumptionNumericSchema,
+  ClaimOwner,
+  ClaimStatus,
+  claimSchema,
+  claimsConflict,
+  contradictionPredicate,
+  mayAgentMutate,
+} from "./claim";
 import { EvidenceVendor, evidenceSchema } from "./evidence";
 
 const baseEntity = {
@@ -39,8 +47,73 @@ describe("claimSchema", () => {
       kind: ClaimKind.Assumption,
       statement: "Pilot adoption rate",
       numeric: { unit: "percent", value: 18 },
+      owner: "user",
+      status: "active",
     });
     expect(r.success).toBe(true);
+  });
+});
+
+describe("claim owner and status", () => {
+  const assumption = {
+    ...baseEntity,
+    sessionId: "00000000-0000-4000-8000-000000000002",
+    kind: ClaimKind.Assumption,
+    statement: "Pilot adoption rate",
+    numeric: { unit: "percent" as const, value: 18 },
+    owner: ClaimOwner.DemoFixture,
+    status: ClaimStatus.Active,
+    locked: true,
+    mapsTo: "adoption_rate",
+    rationaleTag: "demo_fixture" as const,
+  };
+
+  it("requires owner and status", () => {
+    const { owner, status, ...rest } = assumption;
+    expect(claimSchema.safeParse(rest).success).toBe(false);
+  });
+
+  it("rejects contradicted without contradictingEvidenceId", () => {
+    expect(
+      claimSchema.safeParse({
+        ...assumption,
+        status: ClaimStatus.Contradicted,
+      }).success,
+    ).toBe(false);
+  });
+
+  it("mayAgentMutate is false for demo_fixture, user, and locked", () => {
+    expect(mayAgentMutate(assumption)).toBe(false);
+    expect(mayAgentMutate({ ...assumption, owner: ClaimOwner.User, locked: false })).toBe(
+      false,
+    );
+    expect(mayAgentMutate({ ...assumption, owner: ClaimOwner.Agent, locked: true })).toBe(
+      false,
+    );
+    expect(mayAgentMutate({ ...assumption, owner: ClaimOwner.Agent, locked: false })).toBe(
+      true,
+    );
+  });
+
+  it("claimsConflict when same mapsTo and different numeric values", () => {
+    const b = {
+      ...assumption,
+      id: "00000000-0000-4000-8000-000000000099",
+      numeric: { unit: "percent" as const, value: 40 },
+    };
+    expect(claimsConflict(assumption, b)).toBe(true);
+    expect(claimsConflict(assumption, { ...b, numeric: assumption.numeric })).toBe(false);
+  });
+
+  it("contradictionPredicate suggests but does not flip status", () => {
+    const evidence = {
+      id: "00000000-0000-4000-8000-000000000010",
+      summary: "Observed competitor pricing changed",
+    };
+    const result = contradictionPredicate(assumption, evidence);
+    expect(result.suggest).toBe(true);
+    expect(result.operatorMustConfirm).toBe(true);
+    expect(assumption.status).toBe(ClaimStatus.Active);
   });
 });
 
