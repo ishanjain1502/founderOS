@@ -23,6 +23,8 @@ This folder decomposes that spec into subproblems that **must** be solved before
 | SP-03 | `.docs/specs/SP-03-decision-intake-and-company-context.md` | `docs/superpowers/plans/2026-10-11-sp03-intake-and-company-context.md` |
 | SP-04 | `.docs/specs/SP-04-evidence-assumptions-uncertainty.md` | `docs/superpowers/plans/2026-10-12-sp04-evidence-assumptions-uncertainty.md` |
 | SP-05 | `.docs/specs/SP-05-crustdata-market-research.md` | `docs/superpowers/plans/2026-10-12-sp05-crustdata-market-research.md` |
+| SP-06 | `.docs/specs/SP-06-synthetic-market-panel.md` | `docs/superpowers/plans/2026-10-12-sp06-synthetic-market-panel.md` |
+| SP-07 | `.docs/specs/SP-07-cfo-ai-financial-evaluation.md` | `docs/superpowers/plans/2026-10-12-sp07-cfo-ai-financial-evaluation.md` |
 
 Subproblem question docs remain the Q&A source of truth; specs consolidate locked answers for builders.
 

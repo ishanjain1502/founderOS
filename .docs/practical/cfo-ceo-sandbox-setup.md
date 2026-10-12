@@ -1,6 +1,6 @@
 # Practical: cfo.ai CEO sandbox (Pilot vs Broad)
 
-**Policy:** Do **not** build shared input/output tables in the hackathon workspace until a **specific B2B tenant** (or their cfo.ai model) is known. Tables and formulas depend on each company’s existing financial model. v1 uses **scenario names** + **per-Decision mapping** (or operator-provided mapping config). See SP-09 for session state and revision.
+**Policy:** Run this bootstrap **inside each company’s cfo.ai workspace** after provisioning ([cfo-workspace-provisioning.md](./cfo-workspace-provisioning.md)). One workspace per company; wizard start assigns `org_id` to the session/user. Tables use the **shared template** row names; formulas stay the minimal CEO Sandbox feature-decision model unless the company later connects real data in cfo.
 
 ## Current state (repo + workspace)
 
