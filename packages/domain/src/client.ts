@@ -7,6 +7,12 @@ export {
 
 export { RunMode, parseRunMode } from "./run-mode";
 
+export {
+  assignPanelSlots,
+  PANEL_SEGMENT_CATALOG,
+  type PanelSlot,
+} from "./panel-assign";
+
 export { buildCrustdataQuery, type BuildCrustdataQueryInput } from "./crustdata-query";
 
 export {
