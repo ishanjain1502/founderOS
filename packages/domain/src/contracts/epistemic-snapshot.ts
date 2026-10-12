@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { claimSchema } from "./claim";
 import { evidenceSchema, type Evidence } from "./evidence";
+import { panelSummarySchema } from "./panel-summary";
 import { inferenceSchema } from "./recommendation";
 
 export const crustdataSourceModeSchema = z.enum([
@@ -35,6 +36,7 @@ export const epistemicSnapshotSchema = z
         crustdata: crustdataResearchStateSchema,
       })
       .optional(),
+    panel: panelSummarySchema.optional(),
   })
   .strict();
 

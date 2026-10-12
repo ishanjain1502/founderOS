@@ -116,6 +116,11 @@ export {
 } from "./contracts/epistemic-snapshot";
 
 export {
+  panelSummarySchema,
+  type PanelSummary,
+} from "./contracts/panel-summary";
+
+export {
   DEMO_OBSERVED_SUMMARY,
   DEMO_HYPOTHESIS_STATEMENT,
   WTP_UNKNOWN_STATEMENT,
