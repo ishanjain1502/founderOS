@@ -11,6 +11,7 @@ import {
 } from "@ceo-sandbox/domain";
 import { mainStyle } from "@/components/intake/steps/shared";
 import { CrustdataResearch } from "@/components/session/CrustdataResearch";
+import { SyntheticPanel } from "@/components/session/SyntheticPanel";
 import { EpistemicLists } from "@/components/session/EpistemicLists";
 
 type SessionPayload = {
@@ -125,6 +126,13 @@ export default function SessionPlaceholderPage() {
         recordedBanner={epistemicVm.recordedBanner}
         fallbackBanner={epistemicVm.fallbackBanner}
         querySubmitted={epistemicVm.querySubmitted}
+        onComplete={() => void refreshSession()}
+      />
+      <SyntheticPanel
+        sessionId={sessionId}
+        sessionStatus={sessionStatus}
+        mode={intake?.mode ?? RunMode.Demo}
+        panel={epistemic?.panel}
         onComplete={() => void refreshSession()}
       />
       <EpistemicLists model={epistemicVm} />
