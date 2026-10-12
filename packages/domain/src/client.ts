@@ -20,6 +20,23 @@ export {
   type PanelCompletion,
 } from "./panel-aggregate";
 
+export {
+  PANEL_MODEL_ID,
+  PANEL_DEMO_USD_CAP,
+  PANEL_FULL_USD_CAP,
+  PANEL_DEMO_CLOCK_MS,
+  PANEL_FULL_CLOCK_MS,
+  PANEL_FULL_NOTICE_MS,
+  estimatePanelUsd,
+} from "./panel-cost";
+
+export {
+  buildPanelStimulus,
+  type PanelStimulusBuilt,
+} from "./panel-stimulus";
+
+export { PANEL_COPY } from "./panel-copy";
+
 export { buildCrustdataQuery, type BuildCrustdataQueryInput } from "./crustdata-query";
 
 export {
