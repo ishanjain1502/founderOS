@@ -286,6 +286,8 @@ describe("runPanelPath", () => {
     expect(snapshot.panel?.source).toBe("fixture");
     expect(snapshot.panel?.panelSeed).toBe("seed-1");
     expect(snapshot.panel?.rerunCount).toBe(0);
+    expect(snapshot.panel?.nCompleted).toBe(10);
+    expect(snapshot.panel?.evaluationAttempts).toBe(10);
   });
 
   it("full without apiKey is unavailable live", async () => {
@@ -369,7 +371,9 @@ describe("runPanelPath", () => {
     );
     expect(evalHttpCalls).toBe(0);
     expect(snapshot.panel?.status).toBe("fallback");
-    expect(snapshot.panel?.nCompleted).toBe(0);
+    expect(snapshot.panel?.source).toBe("fixture");
+    expect(snapshot.panel?.nCompleted).toBe(10);
+    expect(snapshot.panel?.evaluationAttempts).toBe(10);
   });
 
   it("uses two fill batches then caps evaluation concurrency at five", async () => {

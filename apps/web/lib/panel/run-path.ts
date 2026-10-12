@@ -445,8 +445,6 @@ export async function runPanelPath(input: {
           rerunCount,
           status: "fallback",
           source: "fixture",
-          nCompleted: 0,
-          evaluationAttempts,
         };
         profilesOut = fixture.rows.profiles;
         evaluationsOut = fixture.rows.evaluations;
@@ -566,8 +564,6 @@ export async function runPanelPath(input: {
       rerunCount,
       status: "fallback",
       source: "fixture",
-      nCompleted: 0,
-      evaluationAttempts: 0,
     };
     profilesOut = fixture.rows.profiles;
     evaluationsOut = fixture.rows.evaluations;
