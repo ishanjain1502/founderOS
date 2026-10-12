@@ -1,0 +1,640 @@
+{
+  "summary": {
+    "status": "fallback",
+    "source": "fixture",
+    "panelRunId": "a1b2c3d4-e5f6-4789-a012-3456789abcde",
+    "panelSeed": "42",
+    "modelId": "deepseek/deepseek-v4-flash",
+    "questionnaireVersion": 1,
+    "nRequested": 10,
+    "nCompleted": 10,
+    "evaluationAttempts": 10,
+    "stopReason": "none",
+    "lowDisagreement": false,
+    "priceShown": null,
+    "packaging": null,
+    "currentUserCount": 7,
+    "promptTokens": 0,
+    "completionTokens": 0,
+    "cacheReadTokens": 0,
+    "estimatedUsd": 0,
+    "segments": [
+      {
+        "primarySegment": "price_sensitive_smb",
+        "n": 2,
+        "lowN": false,
+        "choiceCounts": {
+          "pay_extra": 2,
+          "use_if_included": 0,
+          "try_not_pay": 0,
+          "ignore": 0,
+          "consider_switching": 0
+        },
+        "choiceRatesPercent": {
+          "pay_extra": 100,
+          "use_if_included": 0,
+          "try_not_pay": 0,
+          "ignore": 0,
+          "consider_switching": 0
+        },
+        "meanConfidence": 71,
+        "topObjections": [
+          "Budget too tight for add-ons",
+          "ROI case weak"
+        ]
+      },
+      {
+        "primarySegment": "enterprise_buyer",
+        "n": 2,
+        "lowN": false,
+        "choiceCounts": {
+          "pay_extra": 0,
+          "use_if_included": 0,
+          "try_not_pay": 0,
+          "ignore": 2,
+          "consider_switching": 0
+        },
+        "choiceRatesPercent": {
+          "pay_extra": 0,
+          "use_if_included": 0,
+          "try_not_pay": 0,
+          "ignore": 100,
+          "consider_switching": 0
+        },
+        "meanConfidence": 47.5,
+        "topObjections": [
+          "Security review backlog",
+          "Procurement freeze"
+        ]
+      },
+      {
+        "primarySegment": "power_user",
+        "n": 2,
+        "lowN": false,
+        "choiceCounts": {
+          "pay_extra": 0,
+          "use_if_included": 1,
+          "try_not_pay": 1,
+          "ignore": 0,
+          "consider_switching": 0
+        },
+        "choiceRatesPercent": {
+          "pay_extra": 0,
+          "use_if_included": 50,
+          "try_not_pay": 50,
+          "ignore": 0,
+          "consider_switching": 0
+        },
+        "meanConfidence": 65,
+        "topObjections": [
+          "Workflow fit unclear",
+          "Training burden"
+        ]
+      },
+      {
+        "primarySegment": "loyal_existing",
+        "n": 2,
+        "lowN": false,
+        "choiceCounts": {
+          "pay_extra": 0,
+          "use_if_included": 1,
+          "try_not_pay": 0,
+          "ignore": 0,
+          "consider_switching": 1
+        },
+        "choiceRatesPercent": {
+          "pay_extra": 0,
+          "use_if_included": 50,
+          "try_not_pay": 0,
+          "ignore": 0,
+          "consider_switching": 50
+        },
+        "meanConfidence": 56.5,
+        "topObjections": [
+          "Switching cost concern",
+          "Incremental value only"
+        ]
+      },
+      {
+        "primarySegment": "low_engagement",
+        "n": 1,
+        "lowN": true,
+        "choiceCounts": {
+          "pay_extra": 0,
+          "use_if_included": 0,
+          "try_not_pay": 1,
+          "ignore": 0,
+          "consider_switching": 0
+        },
+        "choiceRatesPercent": {
+          "pay_extra": 0,
+          "use_if_included": 0,
+          "try_not_pay": 100,
+          "ignore": 0,
+          "consider_switching": 0
+        },
+        "meanConfidence": 40,
+        "topObjections": [
+          "Low priority initiative"
+        ]
+      },
+      {
+        "primarySegment": "technical_evaluator",
+        "n": 1,
+        "lowN": true,
+        "choiceCounts": {
+          "pay_extra": 1,
+          "use_if_included": 0,
+          "try_not_pay": 0,
+          "ignore": 0,
+          "consider_switching": 0
+        },
+        "choiceRatesPercent": {
+          "pay_extra": 100,
+          "use_if_included": 0,
+          "try_not_pay": 0,
+          "ignore": 0,
+          "consider_switching": 0
+        },
+        "meanConfidence": 85,
+        "topObjections": [
+          "Needs API proof"
+        ]
+      }
+    ],
+    "noSimulatedRespondents": [],
+    "overall": {
+      "n": 10,
+      "choiceCounts": {
+        "pay_extra": 3,
+        "use_if_included": 2,
+        "try_not_pay": 2,
+        "ignore": 2,
+        "consider_switching": 1
+      },
+      "choiceRatesPercent": {
+        "pay_extra": 30,
+        "use_if_included": 20,
+        "try_not_pay": 20,
+        "ignore": 20,
+        "consider_switching": 10
+      },
+      "meanConfidence": 60.5
+    },
+    "disagreement": true,
+    "polarizedPairs": [
+      {
+        "choice": "pay_extra",
+        "left": "price_sensitive_smb",
+        "right": "enterprise_buyer",
+        "leftObjection": "Budget too tight for add-ons",
+        "rightObjection": "Security review backlog"
+      },
+      {
+        "choice": "pay_extra",
+        "left": "price_sensitive_smb",
+        "right": "power_user",
+        "leftObjection": "Budget too tight for add-ons",
+        "rightObjection": "Workflow fit unclear"
+      },
+      {
+        "choice": "pay_extra",
+        "left": "price_sensitive_smb",
+        "right": "loyal_existing",
+        "leftObjection": "Budget too tight for add-ons",
+        "rightObjection": "Switching cost concern"
+      },
+      {
+        "choice": "pay_extra",
+        "left": "price_sensitive_smb",
+        "right": "low_engagement",
+        "leftObjection": "Budget too tight for add-ons",
+        "rightObjection": "Low priority initiative"
+      },
+      {
+        "choice": "pay_extra",
+        "left": "enterprise_buyer",
+        "right": "technical_evaluator",
+        "leftObjection": "Security review backlog",
+        "rightObjection": "Needs API proof"
+      },
+      {
+        "choice": "pay_extra",
+        "left": "power_user",
+        "right": "technical_evaluator",
+        "leftObjection": "Workflow fit unclear",
+        "rightObjection": "Needs API proof"
+      },
+      {
+        "choice": "pay_extra",
+        "left": "loyal_existing",
+        "right": "technical_evaluator",
+        "leftObjection": "Switching cost concern",
+        "rightObjection": "Needs API proof"
+      },
+      {
+        "choice": "pay_extra",
+        "left": "low_engagement",
+        "right": "technical_evaluator",
+        "leftObjection": "Low priority initiative",
+        "rightObjection": "Needs API proof"
+      },
+      {
+        "choice": "use_if_included",
+        "left": "price_sensitive_smb",
+        "right": "power_user",
+        "leftObjection": "Budget too tight for add-ons",
+        "rightObjection": "Workflow fit unclear"
+      },
+      {
+        "choice": "use_if_included",
+        "left": "price_sensitive_smb",
+        "right": "loyal_existing",
+        "leftObjection": "Budget too tight for add-ons",
+        "rightObjection": "Switching cost concern"
+      },
+      {
+        "choice": "use_if_included",
+        "left": "enterprise_buyer",
+        "right": "power_user",
+        "leftObjection": "Security review backlog",
+        "rightObjection": "Workflow fit unclear"
+      },
+      {
+        "choice": "use_if_included",
+        "left": "enterprise_buyer",
+        "right": "loyal_existing",
+        "leftObjection": "Security review backlog",
+        "rightObjection": "Switching cost concern"
+      },
+      {
+        "choice": "use_if_included",
+        "left": "power_user",
+        "right": "low_engagement",
+        "leftObjection": "Workflow fit unclear",
+        "rightObjection": "Low priority initiative"
+      },
+      {
+        "choice": "use_if_included",
+        "left": "power_user",
+        "right": "technical_evaluator",
+        "leftObjection": "Workflow fit unclear",
+        "rightObjection": "Needs API proof"
+      },
+      {
+        "choice": "use_if_included",
+        "left": "loyal_existing",
+        "right": "low_engagement",
+        "leftObjection": "Switching cost concern",
+        "rightObjection": "Low priority initiative"
+      },
+      {
+        "choice": "use_if_included",
+        "left": "loyal_existing",
+        "right": "technical_evaluator",
+        "leftObjection": "Switching cost concern",
+        "rightObjection": "Needs API proof"
+      },
+      {
+        "choice": "try_not_pay",
+        "left": "price_sensitive_smb",
+        "right": "power_user",
+        "leftObjection": "Budget too tight for add-ons",
+        "rightObjection": "Workflow fit unclear"
+      },
+      {
+        "choice": "try_not_pay",
+        "left": "price_sensitive_smb",
+        "right": "low_engagement",
+        "leftObjection": "Budget too tight for add-ons",
+        "rightObjection": "Low priority initiative"
+      },
+      {
+        "choice": "try_not_pay",
+        "left": "enterprise_buyer",
+        "right": "power_user",
+        "leftObjection": "Security review backlog",
+        "rightObjection": "Workflow fit unclear"
+      },
+      {
+        "choice": "try_not_pay",
+        "left": "enterprise_buyer",
+        "right": "low_engagement",
+        "leftObjection": "Security review backlog",
+        "rightObjection": "Low priority initiative"
+      },
+      {
+        "choice": "try_not_pay",
+        "left": "power_user",
+        "right": "loyal_existing",
+        "leftObjection": "Workflow fit unclear",
+        "rightObjection": "Switching cost concern"
+      },
+      {
+        "choice": "try_not_pay",
+        "left": "power_user",
+        "right": "low_engagement",
+        "leftObjection": "Workflow fit unclear",
+        "rightObjection": "Low priority initiative"
+      },
+      {
+        "choice": "try_not_pay",
+        "left": "power_user",
+        "right": "technical_evaluator",
+        "leftObjection": "Workflow fit unclear",
+        "rightObjection": "Needs API proof"
+      },
+      {
+        "choice": "try_not_pay",
+        "left": "loyal_existing",
+        "right": "low_engagement",
+        "leftObjection": "Switching cost concern",
+        "rightObjection": "Low priority initiative"
+      },
+      {
+        "choice": "try_not_pay",
+        "left": "low_engagement",
+        "right": "technical_evaluator",
+        "leftObjection": "Low priority initiative",
+        "rightObjection": "Needs API proof"
+      },
+      {
+        "choice": "ignore",
+        "left": "price_sensitive_smb",
+        "right": "enterprise_buyer",
+        "leftObjection": "Budget too tight for add-ons",
+        "rightObjection": "Security review backlog"
+      },
+      {
+        "choice": "ignore",
+        "left": "enterprise_buyer",
+        "right": "power_user",
+        "leftObjection": "Security review backlog",
+        "rightObjection": "Workflow fit unclear"
+      },
+      {
+        "choice": "ignore",
+        "left": "enterprise_buyer",
+        "right": "loyal_existing",
+        "leftObjection": "Security review backlog",
+        "rightObjection": "Switching cost concern"
+      },
+      {
+        "choice": "ignore",
+        "left": "enterprise_buyer",
+        "right": "low_engagement",
+        "leftObjection": "Security review backlog",
+        "rightObjection": "Low priority initiative"
+      },
+      {
+        "choice": "ignore",
+        "left": "enterprise_buyer",
+        "right": "technical_evaluator",
+        "leftObjection": "Security review backlog",
+        "rightObjection": "Needs API proof"
+      },
+      {
+        "choice": "consider_switching",
+        "left": "price_sensitive_smb",
+        "right": "loyal_existing",
+        "leftObjection": "Budget too tight for add-ons",
+        "rightObjection": "Switching cost concern"
+      },
+      {
+        "choice": "consider_switching",
+        "left": "enterprise_buyer",
+        "right": "loyal_existing",
+        "leftObjection": "Security review backlog",
+        "rightObjection": "Switching cost concern"
+      },
+      {
+        "choice": "consider_switching",
+        "left": "power_user",
+        "right": "loyal_existing",
+        "leftObjection": "Workflow fit unclear",
+        "rightObjection": "Switching cost concern"
+      },
+      {
+        "choice": "consider_switching",
+        "left": "loyal_existing",
+        "right": "low_engagement",
+        "leftObjection": "Switching cost concern",
+        "rightObjection": "Low priority initiative"
+      },
+      {
+        "choice": "consider_switching",
+        "left": "loyal_existing",
+        "right": "technical_evaluator",
+        "leftObjection": "Switching cost concern",
+        "rightObjection": "Needs API proof"
+      }
+    ],
+    "rerunCount": 0
+  },
+  "rows": {
+    "profiles": [
+      {
+        "profileId": "0000",
+        "primarySegment": "price_sensitive_smb",
+        "usesProduct": true,
+        "companySizeBand": "smb",
+        "budgetSensitivity": 3,
+        "painLevel": 3,
+        "workflowSummary": "Runs weekly ops reviews",
+        "aiAdoptionComfort": 3,
+        "switchingCost": "medium",
+        "buyingAuthority": "decider",
+        "primaryPurchasePriority": "price"
+      },
+      {
+        "profileId": "0001",
+        "primarySegment": "enterprise_buyer",
+        "usesProduct": true,
+        "companySizeBand": "smb",
+        "budgetSensitivity": 3,
+        "painLevel": 3,
+        "workflowSummary": "Runs weekly ops reviews",
+        "aiAdoptionComfort": 3,
+        "switchingCost": "medium",
+        "buyingAuthority": "decider",
+        "primaryPurchasePriority": "price"
+      },
+      {
+        "profileId": "0002",
+        "primarySegment": "power_user",
+        "usesProduct": true,
+        "companySizeBand": "smb",
+        "budgetSensitivity": 3,
+        "painLevel": 3,
+        "workflowSummary": "Runs weekly ops reviews",
+        "aiAdoptionComfort": 3,
+        "switchingCost": "medium",
+        "buyingAuthority": "decider",
+        "primaryPurchasePriority": "price"
+      },
+      {
+        "profileId": "0003",
+        "primarySegment": "loyal_existing",
+        "usesProduct": true,
+        "companySizeBand": "smb",
+        "budgetSensitivity": 3,
+        "painLevel": 3,
+        "workflowSummary": "Runs weekly ops reviews",
+        "aiAdoptionComfort": 3,
+        "switchingCost": "medium",
+        "buyingAuthority": "decider",
+        "primaryPurchasePriority": "price"
+      },
+      {
+        "profileId": "0004",
+        "primarySegment": "low_engagement",
+        "usesProduct": true,
+        "companySizeBand": "smb",
+        "budgetSensitivity": 3,
+        "painLevel": 3,
+        "workflowSummary": "Runs weekly ops reviews",
+        "aiAdoptionComfort": 3,
+        "switchingCost": "medium",
+        "buyingAuthority": "decider",
+        "primaryPurchasePriority": "price"
+      },
+      {
+        "profileId": "0005",
+        "primarySegment": "technical_evaluator",
+        "usesProduct": true,
+        "companySizeBand": "smb",
+        "budgetSensitivity": 3,
+        "painLevel": 3,
+        "workflowSummary": "Runs weekly ops reviews",
+        "aiAdoptionComfort": 3,
+        "switchingCost": "medium",
+        "buyingAuthority": "decider",
+        "primaryPurchasePriority": "price"
+      },
+      {
+        "profileId": "0006",
+        "primarySegment": "price_sensitive_smb",
+        "usesProduct": true,
+        "companySizeBand": "smb",
+        "budgetSensitivity": 3,
+        "painLevel": 3,
+        "workflowSummary": "Runs weekly ops reviews",
+        "aiAdoptionComfort": 3,
+        "switchingCost": "medium",
+        "buyingAuthority": "decider",
+        "primaryPurchasePriority": "price"
+      },
+      {
+        "profileId": "0007",
+        "primarySegment": "enterprise_buyer",
+        "usesProduct": false,
+        "companySizeBand": "smb",
+        "budgetSensitivity": 3,
+        "painLevel": 3,
+        "workflowSummary": "Runs weekly ops reviews",
+        "aiAdoptionComfort": 3,
+        "switchingCost": "medium",
+        "buyingAuthority": "decider",
+        "primaryPurchasePriority": "price"
+      },
+      {
+        "profileId": "0008",
+        "primarySegment": "power_user",
+        "usesProduct": false,
+        "companySizeBand": "smb",
+        "budgetSensitivity": 3,
+        "painLevel": 3,
+        "workflowSummary": "Runs weekly ops reviews",
+        "aiAdoptionComfort": 3,
+        "switchingCost": "medium",
+        "buyingAuthority": "decider",
+        "primaryPurchasePriority": "price"
+      },
+      {
+        "profileId": "0009",
+        "primarySegment": "loyal_existing",
+        "usesProduct": false,
+        "companySizeBand": "smb",
+        "budgetSensitivity": 3,
+        "painLevel": 3,
+        "workflowSummary": "Runs weekly ops reviews",
+        "aiAdoptionComfort": 3,
+        "switchingCost": "medium",
+        "buyingAuthority": "decider",
+        "primaryPurchasePriority": "price"
+      }
+    ],
+    "evaluations": [
+      {
+        "profileId": "0000",
+        "primarySegment": "price_sensitive_smb",
+        "primaryChoice": "pay_extra",
+        "confidence": 72,
+        "objection": "Budget too tight for add-ons"
+      },
+      {
+        "profileId": "0001",
+        "primarySegment": "enterprise_buyer",
+        "primaryChoice": "ignore",
+        "confidence": 45,
+        "objection": "Security review backlog"
+      },
+      {
+        "profileId": "0002",
+        "primarySegment": "power_user",
+        "primaryChoice": "use_if_included",
+        "confidence": 68,
+        "objection": "Workflow fit unclear"
+      },
+      {
+        "profileId": "0003",
+        "primarySegment": "loyal_existing",
+        "primaryChoice": "consider_switching",
+        "confidence": 55,
+        "objection": "Switching cost concern"
+      },
+      {
+        "profileId": "0004",
+        "primarySegment": "low_engagement",
+        "primaryChoice": "try_not_pay",
+        "confidence": 40,
+        "objection": "Low priority initiative"
+      },
+      {
+        "profileId": "0005",
+        "primarySegment": "technical_evaluator",
+        "primaryChoice": "pay_extra",
+        "confidence": 85,
+        "objection": "Needs API proof"
+      },
+      {
+        "profileId": "0006",
+        "primarySegment": "price_sensitive_smb",
+        "primaryChoice": "pay_extra",
+        "confidence": 70,
+        "objection": "ROI case weak"
+      },
+      {
+        "profileId": "0007",
+        "primarySegment": "enterprise_buyer",
+        "primaryChoice": "ignore",
+        "confidence": 50,
+        "objection": "Procurement freeze"
+      },
+      {
+        "profileId": "0008",
+        "primarySegment": "power_user",
+        "primaryChoice": "try_not_pay",
+        "confidence": 62,
+        "objection": "Training burden"
+      },
+      {
+        "profileId": "0009",
+        "primarySegment": "loyal_existing",
+        "primaryChoice": "use_if_included",
+        "confidence": 58,
+        "objection": "Incremental value only"
+      }
+    ]
+  }
+}

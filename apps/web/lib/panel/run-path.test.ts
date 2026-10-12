@@ -1,3 +1,5 @@
+import { readFileSync } from "node:fs";
+import { join } from "node:path";
 import { describe, expect, it, vi } from "vitest";
 import {
   emptyEpistemicSnapshot,
@@ -7,7 +9,6 @@ import {
   RunMode,
   validateEpistemicSnapshot,
   type EpistemicSnapshot,
-  type PanelSummary,
 } from "@ceo-sandbox/domain";
 import { runPanelPath, type PanelSummaryAndRows } from "./run-path";
 
@@ -15,88 +16,13 @@ const SESSION = "00000000-0000-4000-8000-000000000010";
 const RUN_ID = "00000000-0000-4000-8000-000000000020";
 const STARTED = 1_000_000;
 
-const ZERO_CHOICE_COUNTS = {
-  pay_extra: 0,
-  use_if_included: 0,
-  try_not_pay: 0,
-  ignore: 0,
-  consider_switching: 0,
-} as const;
-
-const ZERO_CHOICE_RATES = {
-  pay_extra: 0,
-  use_if_included: 0,
-  try_not_pay: 0,
-  ignore: 0,
-  consider_switching: 0,
-} as const;
-
-function makeMinimalFixture(): PanelSummaryAndRows {
-  const segments = [
-    PrimarySegment.PriceSensitiveSmb,
-    PrimarySegment.EnterpriseBuyer,
-    PrimarySegment.PowerUser,
-    PrimarySegment.LoyalExisting,
-    PrimarySegment.LowEngagement,
-    PrimarySegment.TechnicalEvaluator,
-  ].map((primarySegment, i) => ({
-    primarySegment,
-    n: i < 4 ? 2 : 1,
-    lowN: i >= 4,
-    choiceCounts: { ...ZERO_CHOICE_COUNTS, use_if_included: i < 4 ? 2 : 1 },
-    choiceRatesPercent: {
-      ...ZERO_CHOICE_RATES,
-      use_if_included: i < 4 ? 100 : 100,
-    },
-    meanConfidence: 70,
-    topObjections: ["Cost"],
-  }));
-
-  const summary: PanelSummary = {
-    status: "fallback",
-    source: "fixture",
-    panelRunId: "00000000-0000-4000-8000-000000000099",
-    panelSeed: "fixture-seed",
-    modelId: "deepseek/deepseek-v4-flash",
-    questionnaireVersion: 1,
-    nRequested: 10,
-    nCompleted: 10,
-    evaluationAttempts: 10,
-    stopReason: "none",
-    lowDisagreement: true,
-    priceShown: null,
-    packaging: null,
-    currentUserCount: 7,
-    promptTokens: 0,
-    completionTokens: 0,
-    cacheReadTokens: 0,
-    estimatedUsd: 0,
-    segments,
-    noSimulatedRespondents: [],
-    overall: {
-      n: 10,
-      choiceCounts: { ...ZERO_CHOICE_COUNTS, use_if_included: 10 },
-      choiceRatesPercent: { ...ZERO_CHOICE_RATES, use_if_included: 100 },
-      meanConfidence: 70,
-    },
-    disagreement: false,
-    polarizedPairs: [],
-    rerunCount: 0,
-  };
-  expect(panelSummarySchema.safeParse(summary).success).toBe(true);
-  const nBySegment = new Map<string, number>();
-  for (const row of segments) {
-    nBySegment.set(row.primarySegment, row.n);
-  }
-  expect(nBySegment.size).toBeGreaterThanOrEqual(6);
-  expect([...nBySegment.values()].filter((n) => n >= 2).length).toBeGreaterThanOrEqual(
-    4,
-  );
-
-  return {
-    summary,
-    rows: { profiles: [{ id: "fixture-profile" }], evaluations: [{ id: "fixture-eval" }] },
-  };
+function loadDemoFixture(): PanelSummaryAndRows {
+  return JSON.parse(
+    readFileSync(
+      join(__dirname, "../../../../fixtures/panel/demo_run.json"),
+      "utf8",
+    ),
+  ) as PanelSummaryAndRows;
 }
 
 function validProfileFields(profileId: string, overrides: Record<string, unknown> = {}) {
@@ -220,11 +146,35 @@ function baseInput(
     nowMs: () => STARTED,
     startedAtMs: STARTED,
     writeRaw: vi.fn(),
-    loadFixture: makeMinimalFixture,
+    loadFixture: loadDemoFixture,
     newRunId: () => RUN_ID,
     ...overrides,
   };
 }
+
+describe("demo panel fixture", () => {
+  it("parses and meets the demo segment gates", () => {
+    const raw = JSON.parse(
+      readFileSync(
+        join(__dirname, "../../../../fixtures/panel/demo_run.json"),
+        "utf8",
+      ),
+    );
+    expect(panelSummarySchema.safeParse(raw.summary).success).toBe(true);
+    expect(raw.summary.status).toBe("fallback");
+    expect(raw.summary.source).toBe("fixture");
+    const nBySegment = new Map<string, number>();
+    for (const row of raw.rows.evaluations) {
+      nBySegment.set(
+        row.primarySegment,
+        (nBySegment.get(row.primarySegment) ?? 0) + 1,
+      );
+    }
+    expect(nBySegment.size).toBeGreaterThanOrEqual(6);
+    const doubles = [...nBySegment.values()].filter((n) => n >= 2);
+    expect(doubles.length).toBeGreaterThanOrEqual(4);
+  });
+});
 
 describe("runPanelPath", () => {
   it("demo N=10 with key completes live and writes raw once", async () => {
