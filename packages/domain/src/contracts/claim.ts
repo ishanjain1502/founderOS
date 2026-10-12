@@ -81,12 +81,19 @@ const hypothesisClaimSchema = baseEntitySchema.extend({
   resolution: claimResolutionSchema.default(ClaimResolution.Open),
 });
 
+export const panelDerivedFromSchema = z.object({
+  panelRunId: z.string().uuid(),
+  segmentIds: z.array(z.string().min(1)).min(1),
+  questionId: z.string().min(1),
+});
+
 const assumptionClaimSchema = baseEntitySchema.extend({
   ...claimCommonFields,
   kind: z.literal(ClaimKind.Assumption),
   numeric: assumptionNumericSchema.optional(),
   mapsTo: z.string().min(1).optional(),
   numericRange: numericRangeSchema.optional(),
+  derivedFrom: panelDerivedFromSchema.optional(),
 });
 
 const unknownClaimSchema = baseEntitySchema.extend({

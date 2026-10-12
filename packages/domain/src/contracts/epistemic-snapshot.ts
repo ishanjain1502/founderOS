@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { claimSchema } from "./claim";
 import { evidenceSchema, type Evidence } from "./evidence";
+import { financeStateSchema } from "./finance-snapshot";
 import { panelSummarySchema } from "./panel-summary";
 import { inferenceSchema } from "./recommendation";
 
@@ -37,6 +38,7 @@ export const epistemicSnapshotSchema = z
       })
       .optional(),
     panel: panelSummarySchema.optional(),
+    finance: financeStateSchema.optional(),
   })
   .strict();
 

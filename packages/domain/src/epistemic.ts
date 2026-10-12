@@ -20,6 +20,8 @@ export const CLAIM_SAFETY_COPY = {
     "Customer panel results are simulated, not primary research data.",
   financeNotForecast:
     "Financial figures are illustrative scenarios, not verified projections.",
+  financeModeled:
+    "Modeled — cfo.ai workspace (not a verified forecast).",
   competitorNotDemand:
     "Competitor activity does not prove customer demand for this feature.",
   fallbackBanner:

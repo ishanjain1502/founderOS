@@ -80,6 +80,14 @@ export {
 } from "./contracts/claim";
 
 export {
+  cfoWorkspaceSchema,
+  buildCfoWorkspaceKey,
+  createInitialCfoWorkspace,
+  slugifyCompanyName,
+  type CfoWorkspace,
+} from "./contracts/cfo-workspace";
+
+export {
   LAST_SESSION_COOKIE,
   SHORT_TEXT_MAX,
   QUESTION_MAX,
@@ -119,6 +127,24 @@ export {
   panelSummarySchema,
   type PanelSummary,
 } from "./contracts/panel-summary";
+
+export {
+  financeStateSchema,
+  type FinanceState,
+} from "./contracts/finance-snapshot";
+
+export {
+  validateFinanceAssumptionPack,
+  buildAssumptionPackDigest,
+} from "./finance-assumption-pack";
+
+export { runFinanceDeterministicChecks } from "./finance-checks";
+export {
+  buildSensitivityGrid,
+  rankSensitivityDrivers,
+} from "./finance-sensitivity";
+
+export { financeStateFromFixture } from "./finance-fixture";
 
 export {
   DEMO_OBSERVED_SUMMARY,

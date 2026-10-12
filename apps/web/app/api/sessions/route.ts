@@ -17,6 +17,7 @@ import {
 } from "@/lib/load-demo-card";
 import { setLastSessionCookie } from "@/lib/session-cookie";
 import { sessionToJson } from "@/lib/session-response";
+import { initializeSessionCfoWorkspace } from "@/lib/cfo-ai/provision";
 import { getStore } from "@/lib/session-store";
 
 export const runtime = "nodejs";
@@ -58,7 +59,9 @@ export async function POST(request: Request) {
     try {
       const card = await loadDemoCardFixture();
       const intake = demoCardToIntakeDraft(card);
-      const record = getStore().createSession({ mode, intake });
+      let record = getStore().createSession({ mode, intake });
+      const { intake: withCfo } = await initializeSessionCfoWorkspace(record);
+      record = getStore().updateIntake(record.id, withCfo);
       const response = NextResponse.json(sessionToJson(record), { status: 201 });
       return setLastSessionCookie(response, record.id);
     } catch (error) {
@@ -69,7 +72,9 @@ export async function POST(request: Request) {
   }
 
   const intake = emptyIntakeDraft(RunMode.Full);
-  const record = getStore().createSession({ mode, intake });
+  let record = getStore().createSession({ mode, intake });
+  const { intake: withCfo } = await initializeSessionCfoWorkspace(record);
+  record = getStore().updateIntake(record.id, withCfo);
   const response = NextResponse.json(sessionToJson(record), { status: 201 });
   return setLastSessionCookie(response, record.id);
 }

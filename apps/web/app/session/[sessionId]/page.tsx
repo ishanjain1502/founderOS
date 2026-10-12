@@ -11,6 +11,7 @@ import {
 } from "@ceo-sandbox/domain";
 import { mainStyle } from "@/components/intake/steps/shared";
 import { CrustdataResearch } from "@/components/session/CrustdataResearch";
+import { FinanceComparison } from "@/components/session/FinanceComparison";
 import { SyntheticPanel } from "@/components/session/SyntheticPanel";
 import { EpistemicLists } from "@/components/session/EpistemicLists";
 
@@ -133,6 +134,12 @@ export default function SessionPlaceholderPage() {
         sessionStatus={sessionStatus}
         mode={intake?.mode ?? RunMode.Demo}
         panel={epistemic?.panel}
+        onComplete={() => void refreshSession()}
+      />
+      <FinanceComparison
+        sessionId={sessionId}
+        sessionStatus={sessionStatus}
+        finance={epistemic?.finance}
         onComplete={() => void refreshSession()}
       />
       <EpistemicLists model={epistemicVm} />

@@ -55,6 +55,10 @@ describe("POST /api/sessions", () => {
     const body = await created.json();
     expect(body.status).toBe("draft");
     expect(body.intake.mode).toBe("full");
+    expect(body.intake.cfoWorkspace?.workspaceKey).toMatch(
+      /^company-\d{4}-\d{2}-\d{2}T/,
+    );
+    expect(body.intake.cfoWorkspace?.status).toBe("pending");
     const cookie = created.headers.get("set-cookie") ?? "";
     expect(cookie).toContain(LAST_SESSION_COOKIE);
     expect(cookie.toLowerCase()).toContain("httponly");

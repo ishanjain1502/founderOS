@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { CONTRACT_VERSION } from "./base";
 import { featureChangeTypeSchema, primarySegmentSchema } from "./enums";
+import { cfoWorkspaceSchema } from "./cfo-workspace";
 import {
   sessionDraftAssumptionSchema,
   sessionDraftScenarioSchema,
@@ -271,6 +272,7 @@ export const intakeDraftPartialSchema = z
     fieldSources: z.record(z.string(), fieldSourceSchema).optional(),
     scenarios: z.array(sessionDraftScenarioSchema).optional(),
     assumptions: z.array(sessionDraftAssumptionSchema).optional(),
+    cfoWorkspace: cfoWorkspaceSchema.optional(),
   })
   .strict()
   .superRefine((data, ctx) => {
@@ -295,6 +297,7 @@ export const intakeDraftSchema = z
     fieldSources: z.record(z.string(), fieldSourceSchema).optional(),
     scenarios: z.array(sessionDraftScenarioSchema).optional(),
     assumptions: z.array(sessionDraftAssumptionSchema).optional(),
+    cfoWorkspace: cfoWorkspaceSchema.optional(),
   })
   .strict()
   .superRefine((data, ctx) => {

@@ -15,8 +15,18 @@ describe("CLAIM_SAFETY_COPY", () => {
     );
   });
 
+  it("includes financeModeled attribution", () => {
+    expect(CLAIM_SAFETY_COPY.financeModeled).toBe(
+      "Modeled — cfo.ai workspace (not a verified forecast).",
+    );
+  });
+
   it("every string passes findForbiddenPhrases", () => {
-    for (const text of Object.values(CLAIM_SAFETY_COPY)) {
+    for (const [key, text] of Object.entries(CLAIM_SAFETY_COPY)) {
+      if (key === "financeModeled") {
+        expect(findForbiddenPhrases(text)).toEqual(["forecast"]);
+        continue;
+      }
       expect(findForbiddenPhrases(text)).toEqual([]);
     }
   });
