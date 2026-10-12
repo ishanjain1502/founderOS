@@ -1,6 +1,14 @@
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { describe, expect, it } from "vitest";
+import { formatPositiveRatePercent } from "./SyntheticPanel";
+
+describe("formatPositiveRatePercent", () => {
+  it("rounds ratio to one decimal percent", () => {
+    expect(formatPositiveRatePercent(0.8)).toBe("80");
+    expect(formatPositiveRatePercent(0.333)).toBe("33.3");
+  });
+});
 
 describe("SyntheticPanel mount", () => {
   it("is mounted from the session page and uses the shared copy", () => {
@@ -13,5 +21,6 @@ describe("SyntheticPanel mount", () => {
     expect(component.includes("PANEL_COPY.banner")).toBe(true);
     expect(component.includes("PANEL_COPY.run")).toBe(true);
     expect(component.includes("PANEL_FULL_NOTICE_MS")).toBe(true);
+    expect(component.includes("<table")).toBe(true);
   });
 });

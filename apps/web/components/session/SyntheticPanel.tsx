@@ -6,6 +6,7 @@ import {
   PANEL_FULL_NOTICE_MS,
   PrimarySegment,
   RunMode,
+  roundHalfUp1,
   type PanelSummary,
 } from "@ceo-sandbox/domain";
 
@@ -99,6 +100,10 @@ function panelStatusLines(panel: PanelSummary, mode: RunMode): string[] {
     );
   }
   return lines;
+}
+
+export function formatPositiveRatePercent(positiveRate: number): string {
+  return String(roundHalfUp1(positiveRate * 100));
 }
 
 function formatPolarizedPair(
@@ -324,6 +329,8 @@ export function SyntheticPanel({
                   </div>
                 ))}
 
+              <SegmentChoicePercentTable panel={panel} />
+
               {panel.polarizedPairs.length > 0 ? (
                 <div style={{ marginTop: "0.75rem" }}>
                   {panel.polarizedPairs.map((pair, i) => (
@@ -355,7 +362,7 @@ export function SyntheticPanel({
               {panel.strongestSegment ? (
                 <p style={{ fontSize: "0.9rem", marginTop: "0.75rem" }}>
                   {panel.strongestSegment.primarySegment} (
-                  {panel.strongestSegment.positiveRate}%)
+                  {formatPositiveRatePercent(panel.strongestSegment.positiveRate)}%)
                   <span style={chipStyle}>{PANEL_COPY.inferred}</span>
                 </p>
               ) : null}
@@ -413,6 +420,53 @@ export function SyntheticPanel({
         </p>
       ) : null}
     </section>
+  );
+}
+
+function SegmentChoicePercentTable({ panel }: { panel: PanelSummary }) {
+  const segments = panel.segments.filter((s) => s.n >= 1);
+  if (segments.length === 0) return null;
+  return (
+    <div style={{ marginTop: "1rem" }}>
+      <h2 style={{ fontSize: "1rem", marginBottom: "0.5rem" }}>
+        Segment × choice
+        <span style={chipStyle}>{PANEL_COPY.simulated}</span>
+      </h2>
+      <table style={{ fontSize: "0.85rem", borderCollapse: "collapse" }}>
+        <thead>
+          <tr>
+            <th style={{ textAlign: "left", padding: "0.25rem 0.5rem" }}>
+              Segment
+            </th>
+            {CHOICE_ORDER.map((choice) => (
+              <th
+                key={choice}
+                style={{ textAlign: "right", padding: "0.25rem 0.5rem" }}
+              >
+                {choice}
+              </th>
+            ))}
+          </tr>
+        </thead>
+        <tbody>
+          {segments.map((seg) => (
+            <tr key={seg.primarySegment}>
+              <td style={{ padding: "0.25rem 0.5rem" }}>
+                {seg.primarySegment}
+              </td>
+              {CHOICE_ORDER.map((choice) => (
+                <td
+                  key={choice}
+                  style={{ textAlign: "right", padding: "0.25rem 0.5rem" }}
+                >
+                  {seg.choiceRatesPercent[choice]}%
+                </td>
+              ))}
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
   );
 }
 

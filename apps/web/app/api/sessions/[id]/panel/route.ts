@@ -2,7 +2,7 @@ import { existsSync, readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { randomInt, randomUUID } from "node:crypto";
 import { FrozenSessionError } from "@ceo-sandbox/db";
-import { RunMode } from "@ceo-sandbox/domain";
+import { RunMode, panelSummarySchema } from "@ceo-sandbox/domain";
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import { notFoundResponse } from "@/lib/api-errors";
@@ -127,7 +127,21 @@ export async function POST(
       join(repoRoot, "fixtures/panel/demo_run.json"),
       "utf8",
     );
-    return JSON.parse(raw) as PanelSummaryAndRows;
+    const fixture = JSON.parse(raw) as PanelSummaryAndRows;
+    if (!Array.isArray(fixture.rows?.profiles)) {
+      throw new Error("fixture rows.profiles must be an array");
+    }
+    if (!Array.isArray(fixture.rows?.evaluations)) {
+      throw new Error("fixture rows.evaluations must be an array");
+    }
+    const summary = panelSummarySchema.parse(fixture.summary);
+    return {
+      summary,
+      rows: {
+        profiles: fixture.rows.profiles,
+        evaluations: fixture.rows.evaluations,
+      },
+    };
   };
 
   let panelSeed: string;
