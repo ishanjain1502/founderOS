@@ -12,6 +12,10 @@ const sessionScopedBaseSchema = baseEntitySchema.extend({
 
 const likertScaleSchema = z.number().int().min(1).max(5);
 
+export const companySizeBandSchema = z.enum(["smb", "mid", "enterprise"]);
+
+export type CompanySizeBand = z.infer<typeof companySizeBandSchema>;
+
 export const switchingCostSchema = z.enum(["low", "medium", "high"]);
 
 export type SwitchingCost = z.infer<typeof switchingCostSchema>;
@@ -38,16 +42,17 @@ export type PrimaryPurchasePriority = z.infer<
 
 /** Structured persona fields (SP-06 profile contract). */
 export const archetypeProfileSchema = z.object({
-  companySizeBand: z.string().min(1),
+  companySizeBand: companySizeBandSchema,
+  usesProduct: z.boolean(),
   budgetSensitivity: likertScaleSchema,
   painLevel: likertScaleSchema,
-  workflowSummary: z.string().min(1),
+  workflowSummary: z.string().trim().min(1).max(280),
   aiAdoptionComfort: likertScaleSchema,
   switchingCost: switchingCostSchema,
   buyingAuthority: buyingAuthoritySchema,
   primaryPurchasePriority: primaryPurchasePrioritySchema,
-  industry: z.string().min(1).optional(),
-  region: z.string().min(1).optional(),
+  industry: z.string().trim().min(1).optional(),
+  region: z.string().trim().min(1).optional(),
 });
 
 export type ArchetypeProfile = z.infer<typeof archetypeProfileSchema>;
@@ -93,6 +98,8 @@ export const respondentEvaluationSchema = baseEntitySchema.extend({
   archetypeId: z.string().uuid(),
   panelStimulusId: z.string().uuid(),
   primaryChoice: panelPrimaryChoiceSchema,
+  confidence: z.number().finite().min(0).max(100),
+  objection: z.string().trim().min(1).max(120),
   snapshot: respondentEvaluationSnapshotSchema,
 });
 

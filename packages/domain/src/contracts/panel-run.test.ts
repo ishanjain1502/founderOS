@@ -18,7 +18,8 @@ const AGG_ID = "00000000-0000-4000-8000-000000000030";
 const CREATED_AT = "2026-01-01T00:00:00.000Z";
 
 const archetypeProfile = {
-  companySizeBand: "mid_market",
+  companySizeBand: "mid",
+  usesProduct: true,
   budgetSensitivity: 3,
   painLevel: 4,
   workflowSummary: "Coordinates weekly ops reviews across three tools.",
@@ -51,6 +52,20 @@ describe("archetypeSchema", () => {
     });
     expect(r.success).toBe(true);
   });
+
+  it("rejects a company size outside smb, mid, and enterprise", () => {
+    const r = archetypeSchema.safeParse({
+      id: ARCHETYPE_ID,
+      sessionId: SESSION_ID,
+      contractVersion: 1,
+      createdAt: CREATED_AT,
+      source: EntitySource.Agent,
+      primarySegment: PrimarySegment.EnterpriseBuyer,
+      ...archetypeProfile,
+      companySizeBand: "mid_market",
+    });
+    expect(r.success).toBe(false);
+  });
 });
 
 describe("respondentEvaluationSchema", () => {
@@ -64,6 +79,8 @@ describe("respondentEvaluationSchema", () => {
       archetypeId: ARCHETYPE_ID,
       panelStimulusId: STIMULUS_ID,
       primaryChoice: PanelPrimaryChoice.PayExtra,
+      confidence: 72.5,
+      objection: "Price is the blocker.",
       snapshot: evaluationSnapshot,
     });
     expect(r.success).toBe(true);
@@ -97,6 +114,22 @@ describe("respondentEvaluationSchema", () => {
       panelRunId: PANEL_RUN_ID,
       archetypeId: ARCHETYPE_ID,
       primaryChoice: PanelPrimaryChoice.Ignore,
+      snapshot: evaluationSnapshot,
+    });
+    expect(r.success).toBe(false);
+  });
+
+  it("rejects an evaluation without confidence", () => {
+    const r = respondentEvaluationSchema.safeParse({
+      id: EVAL_ID,
+      contractVersion: 1,
+      createdAt: CREATED_AT,
+      source: EntitySource.Agent,
+      panelRunId: PANEL_RUN_ID,
+      archetypeId: ARCHETYPE_ID,
+      panelStimulusId: STIMULUS_ID,
+      primaryChoice: PanelPrimaryChoice.PayExtra,
+      objection: "Price is the blocker.",
       snapshot: evaluationSnapshot,
     });
     expect(r.success).toBe(false);
