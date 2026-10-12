@@ -13,6 +13,13 @@ export {
   type PanelSlot,
 } from "./panel-assign";
 
+export {
+  aggregatePanel,
+  roundHalfUp1,
+  type PanelAggregate,
+  type PanelCompletion,
+} from "./panel-aggregate";
+
 export { buildCrustdataQuery, type BuildCrustdataQueryInput } from "./crustdata-query";
 
 export {
